@@ -3,187 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMIT DAS // NEXUS_PRIME</title>
+    <title>SUMIT DAS // NEXUS_OVERDRIVE</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=JetBrains+Mono:wght@200;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #00ffaa; 
-            --bg: #050608;
-            --surface: rgba(255, 255, 255, 0.03);
-            --border: rgba(0, 255, 170, 0.2);
-            --text-main: #ffffff;
-            --text-dim: #808080;
+            --bg: #030405;
+            --surface: rgba(255, 255, 255, 0.02);
+            --border: rgba(0, 255, 170, 0.15);
+            --text: #ffffff;
+            --dim: #808080;
+            --transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 1. CORE SYSTEM RESET */
+        /* OVERDRIVE STATE */
+        body.overdrive { --primary: #ff3333; --border: rgba(255, 51, 51, 0.3); }
+
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        body { 
-            background: var(--bg); 
-            color: var(--text-main); 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #0a110f 0%, #050608 100%);
+        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; transition: background var(--transition); }
+
+        #os-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
+
+        .hud-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; border-bottom: 1px solid var(--border);
+            background: rgba(3, 4, 5, 0.8); backdrop-filter: blur(10px);
+            font-family: 'JetBrains Mono'; font-size: 11px; z-index: 9000; transition: border var(--transition);
         }
 
-        /* 2. THE VISUAL MATRIX (CANVAS) */
-        #bg-canvas { position: fixed; inset: 0; z-index: -1; }
+        .time-item span { color: var(--primary); font-weight: bold; transition: color var(--transition); }
 
-        /* 3. HUD CURSOR */
         #cursor-dot { position: fixed; width: 4px; height: 4px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10001; }
         #cursor-ring { 
             position: fixed; width: 30px; height: 30px; border: 1px solid var(--primary); 
             border-radius: 50%; pointer-events: none; z-index: 10000; 
-            transition: transform 0.1s ease-out, border 0.3s; 
+            transition: transform 0.1s ease-out, border var(--transition); 
         }
 
-        .main-container { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
+        .main-frame { height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 80px 40px 0; }
+        .hero-title { font-size: clamp(50px, 9vw, 100px); font-weight: 800; line-height: 0.85; letter-spacing: -4px; }
+        .strike { color: var(--primary); text-decoration: line-through; text-decoration-thickness: 6px; transition: color var(--transition); }
 
-        /* 4. BRANDING HERO */
-        .hero { margin-bottom: 60px; }
-        .hero-title { font-size: clamp(45px, 10vw, 110px); font-weight: 800; line-height: 0.8; letter-spacing: -4px; }
-        .strike { color: var(--primary); text-decoration: line-through; text-decoration-thickness: 6px; }
-
-        /* 5. THE GLOBAL MONITOR (REBUILT WITHOUT LIBRARIES) */
-        .monitor-box {
+        .terminal {
             background: var(--surface); border: 1px solid var(--border);
-            padding: 30px; border-radius: 4px; position: relative; margin: 40px 0;
-            backdrop-filter: blur(10px);
+            padding: 20px; font-family: 'JetBrains Mono'; font-size: 12px; height: 320px;
+            overflow: hidden; position: relative; transition: border var(--transition);
         }
-        .monitor-header {
-            display: flex; justify-content: space-between; font-family: 'JetBrains Mono';
-            font-size: 11px; color: var(--primary); margin-bottom: 20px;
-        }
-        #map-svg { width: 100%; height: auto; opacity: 0.6; fill: none; stroke: var(--primary); stroke-width: 0.5; }
-        
-        .pulse { fill: var(--primary); animation: pings 2s infinite; }
-        @keyframes pings { 0% { r: 1; opacity: 1; } 100% { r: 15; opacity: 0; } }
 
-        /* 6. BENTO INTERFACE */
-        .bento { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .bento-card { 
-            background: var(--surface); border: 1px solid var(--border); 
-            padding: 40px; transition: 0.4s; position: relative; overflow: hidden;
+        .uplink-btn {
+            margin-top: 30px; display: inline-block; padding: 15px 30px;
+            border: 1px solid var(--primary); color: var(--primary);
+            text-decoration: none; font-family: 'JetBrains Mono'; transition: var(--transition);
         }
-        .bento-card:hover { border-color: var(--primary); transform: translateY(-5px); background: rgba(0, 255, 170, 0.05); }
-        .tag { font-family: 'JetBrains Mono'; color: var(--primary); font-size: 11px; text-transform: uppercase; }
+        .uplink-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 30px var(--primary); }
 
-        .btn {
-            display: inline-block; padding: 15px 30px; background: var(--primary); 
-            color: #000; font-family: 'JetBrains Mono'; font-weight: bold; 
-            text-decoration: none; margin-top: 25px; transition: 0.3s;
+        @media (max-width: 900px) {
+            .main-frame { grid-template-columns: 1fr; height: auto; padding-top: 100px; }
+            #cursor-ring, #cursor-dot { display: none; }
+            * { cursor: auto !important; }
         }
-        .btn:hover { box-shadow: 0 0 30px var(--primary); }
-
-        @media (max-width: 768px) { .bento { grid-template-columns: 1fr; } #cursor-ring, #cursor-dot { display: none; } * { cursor: auto !important; } }
     </style>
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
+    <header class="hud-header">
+        <div>ID: SUMIT_DAS // ACCESS: LEVEL_ALPHA</div>
+        <div style="display: flex; gap: 30px;">
+            <div class="time-item">KOLKATA: <span id="time-ist">--:--:--</span></div>
+            <div class="time-item">UTC: <span id="time-gmt">--:--:--</span></div>
+        </div>
+    </header>
+
+    <canvas id="os-canvas"></canvas>
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
 
-    <main class="main-container">
-        <header class="hero">
-            <span class="tag">// SEC_ENTITY: SUMIT_DAS_V7</span>
+    <main class="main-frame">
+        <section>
             <h1 class="hero-title">Coder.<br><span class="strike">Breaker.</span><br>Builder.</h1>
-            <p style="margin-top: 20px; color: var(--text-dim); max-width: 500px; font-size: 18px;">
-                Cybersecurity Scholar at <span style="color:white">Jadavpur University</span>. Mapping the architecture of resilient systems.
+            <p style="color: var(--dim); margin-top: 20px; max-width: 440px; line-height: 1.6;">
+                Security Engineer. Jadavpur University '26.<br>
+                <span id="secret-hint" style="font-size: 10px; opacity: 0.3;">[TYPE_IDENTITY_TO_UNLOCK]</span>
             </p>
-        </header>
-
-        <section class="monitor-box">
-            <div class="monitor-header">
-                <div>[ SYSTEM_LOG: ACTIVE ]</div>
-                <div id="uplink-text">UPLINK: KOLKATA_NODE_SECURE</div>
-            </div>
-            <svg id="map-svg" viewBox="0 0 800 400">
-                <path d="M100,100 Q150,50 200,100 T300,150 T400,100 T550,150 T700,100" /> <circle cx="580" cy="180" r="3" class="pulse" /> <circle cx="580" cy="180" r="2" fill="white" />
-                <path d="M200,250 Q300,300 450,250 T650,300" opacity="0.3" />
-            </svg>
+            <a href="mailto:sumitdas712424@gmail.com" class="uplink-btn">INITIALIZE_UPLINK</a>
         </section>
 
-        <div class="bento">
-            <div class="bento-card">
-                <span class="tag">Asset_Extraction</span>
-                <h2 style="margin: 15px 0;">Resume_2026.pdf</h2>
-                <p style="color: var(--text-dim); font-size: 14px;">Detailed technical expertise in penetration testing and system architecture.</p>
-                <a href="#" class="btn">Download Assets</a>
+        <section>
+            <div class="terminal" id="feed">
+                <div style="color: var(--primary); margin-bottom: 10px;">> MONITORING_STREAMS...</div>
             </div>
-
-            <div class="bento-card">
-                <span class="tag">Comm_Link</span>
-                <h2 style="margin: 15px 0;">Direct_Uplink</h2>
-                <p style="color: var(--text-dim); font-size: 14px;">Send a secure transmission to sumitdas712424@gmail.com.</p>
-                <a href="mailto:sumitdas712424@gmail.com" class="btn" style="background:transparent; color:var(--primary); border:1px solid var(--primary);">Initialize Chat</a>
-            </div>
-        </div>
+        </section>
     </main>
 
     <script>
-        // 1. DYNAMIC BACKGROUND (Optimized for full-screen)
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let dots = [];
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        // 1. CLOCKS
+        function updateClocks() {
+            const now = new Date();
+            document.getElementById('time-ist').innerText = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour12: false });
+            document.getElementById('time-gmt').innerText = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
         }
+        setInterval(updateClocks, 1000);
+
+        // 2. CANVAS ENTROPY
+        const canvas = document.getElementById('os-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let speedMult = 1;
 
         function init() {
-            dots = [];
-            for(let i=0; i<80; i++) {
-                dots.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4
-                });
-            }
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            points = Array.from({length: 45}, () => ({
+                x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5
+            }));
         }
-
-        function draw() {
+        function animate() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "rgba(0, 255, 170, 0.4)";
-            dots.forEach(d => {
-                d.x += d.vx; d.y += d.vy;
-                if(d.x < 0 || d.x > canvas.width) d.vx *= -1;
-                if(d.y < 0 || d.y > canvas.height) d.vy *= -1;
-                ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+            points.forEach(p => {
+                p.x += p.vx * speedMult; p.y += p.vy * speedMult;
+                if(p.x<0 || p.x>canvas.width) p.vx *= -1;
+                if(p.y<0 || p.y>canvas.height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
             });
-            requestAnimationFrame(draw);
+            requestAnimationFrame(animate);
         }
+        window.addEventListener('resize', init);
+        init(); animate();
 
-        window.addEventListener('resize', () => { resize(); init(); });
-        resize(); init(); draw();
+        // 3. TERMINAL FEED
+        const feed = document.getElementById('feed');
+        const logs = ["Handshake OK", "Clocks Synced", "No anomalies", "Port 443: Listen", "Entropy Nominal"];
+        function addLog(text) {
+            const l = document.createElement('div');
+            l.style.marginBottom = "4px";
+            l.innerHTML = `<span style="color:var(--dim)">[${new Date().toLocaleTimeString()}]</span> ${text || logs[Math.floor(Math.random()*logs.length)]}`;
+            feed.prepend(l);
+            if(feed.children.length > 14) feed.lastElementChild.remove();
+        }
+        setInterval(() => addLog(), 3000);
 
-        // 2. CURSOR FOLLOW
+        // 4. SECRET COMMAND LISTENER
+        let inputString = "";
+        window.addEventListener('keydown', (e) => {
+            inputString += e.key.toLowerCase();
+            if (inputString.includes("sumit")) {
+                document.body.classList.toggle('overdrive');
+                speedMult = document.body.classList.contains('overdrive') ? 5 : 1;
+                addLog("!! OVERDRIVE_MODE_ACTIVATED !!");
+                inputString = "";
+            }
+            if (inputString.length > 10) inputString = "";
+        });
+
+        // 5. CURSOR
         const dot = document.getElementById('cursor-dot');
         const ring = document.getElementById('cursor-ring');
         document.addEventListener('mousemove', (e) => {
             dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
             ring.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
         });
-
-        // 3. UI INTERACTION
-        document.querySelectorAll('.bento-card, .btn').forEach(item => {
-            item.addEventListener('mouseenter', () => {
-                ring.style.transform += ' scale(1.5)';
-                ring.style.borderColor = 'white';
-            });
-            item.addEventListener('mouseleave', () => {
-                ring.style.borderColor = 'var(--primary)';
-            });
-        });
-
-        // 4. RANDOMIZED LOGS
-        const nodes = ["KOLKATA", "LONDON", "TOKYO", "BERLIN", "SINGAPORE"];
-        setInterval(() => {
-            const node = nodes[Math.floor(Math.random()*nodes.length)];
-            document.getElementById('uplink-text').innerText = `UPLINK: ${node}_NODE_STABLE`;
-        }, 4000);
     </script>
 </body>
 </html>
