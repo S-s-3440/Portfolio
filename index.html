@@ -3,216 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMIT_DAS // ROOT_TERMINAL</title>
+    <title>SUMIT_DAS // SOVEREIGN_ZERO</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #00ffaa;
-            --bg: #050608;
+            --bg: #030405;
             --surface: #0a0c10;
-            --border: rgba(0, 255, 170, 0.2);
+            --border: rgba(0, 255, 170, 0.15);
             --text: #e0e0e0;
-            --error: #ff3333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'JetBrains Mono', monospace; 
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
-
-        /* HUD LAYOUT */
-        .workspace {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            grid-template-rows: 50px 1fr 30px;
-            height: 100vh;
-            gap: 1px;
-            background: var(--border);
-        }
-
-        .panel { background: var(--bg); padding: 20px; position: relative; overflow-y: auto; }
-
-        /* HEADER */
-        .header { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 12px; }
-        .glitch-text { color: var(--primary); font-weight: 800; letter-spacing: 2px; }
-
-        /* SIDEBAR: BIO-METRICS */
-        .sidebar { border-right: 1px solid var(--border); }
-        .stat-label { font-size: 9px; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
-        .bio-box { margin-bottom: 30px; border-left: 2px solid var(--primary); padding-left: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        .progress-rail { height: 2px; background: rgba(255,255,255,0.05); width: 100%; margin: 8px 0 20px; }
-        .progress-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 1.5s ease; }
+        /* THE PERFECT CURSOR */
+        #cursor {
+            position: fixed; width: 40px; height: 40px;
+            border: 1px solid var(--primary); border-radius: 50%;
+            pointer-events: none; z-index: 10000;
+            transition: transform 0.1s ease-out, background 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #cursor::after { content: ''; width: 4px; height: 4px; background: #fff; border-radius: 50%; }
 
-        /* THE TERMINAL CORE */
-        .terminal { display: flex; flex-direction: column; background: rgba(5,6,8,0.9); }
-        #output-stream { flex: 1; font-size: 13px; line-height: 1.6; overflow-y: auto; scroll-behavior: smooth; }
-        .input-area { display: flex; align-items: center; color: var(--primary); border-top: 1px solid var(--border); padding-top: 15px; }
-        #cli-input { background: transparent; border: none; color: var(--primary); outline: none; flex: 1; font-family: inherit; font-size: 14px; margin-left: 10px; }
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: 'JetBrains Mono', monospace; 
+            height: 100vh; overflow: hidden;
+            display: grid; grid-template-columns: 350px 1fr; grid-template-rows: 60px 1fr 40px;
+        }
 
-        /* UTILS */
-        .cmd-hint { font-size: 10px; color: var(--dim); margin-top: 5px; }
-        .highlight { color: var(--primary); }
-        .secret-reveal { color: var(--error); font-weight: 800; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.2; }
 
-        @media (max-width: 800px) { .workspace { grid-template-columns: 1fr; } .sidebar { display: none; } }
+        /* INTERFACE PANELS */
+        .panel { border: 0.5px solid var(--border); background: rgba(3, 4, 5, 0.8); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        
+        .header { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; font-size: 11px; }
+        .sidebar { grid-row: span 1; padding: 30px; display: flex; flex-direction: column; gap: 40px; }
+        .main-view { padding: 40px; overflow-y: auto; }
+        .footer { grid-column: span 2; display: flex; align-items: center; padding: 0 20px; font-size: 9px; gap: 20px; opacity: 0.5; }
+
+        /* SKILL MATRIX */
+        .skill-item { margin-bottom: 20px; }
+        .skill-label { font-size: 10px; color: var(--primary); margin-bottom: 8px; display: block; }
+        .bar-bg { height: 2px; background: rgba(255,255,255,0.05); width: 100%; }
+        .bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 2s ease-in-out; }
+
+        /* PROJECT LOGS */
+        .project-card { 
+            border: 1px solid var(--border); padding: 20px; margin-bottom: 20px;
+            transition: 0.3s; cursor: pointer;
+        }
+        .project-card:hover { background: rgba(0, 255, 170, 0.05); border-color: var(--primary); }
+
+        /* TERMINAL INPUT */
+        .terminal-input {
+            display: flex; align-items: center; gap: 10px; color: var(--primary);
+            margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 4px;
+        }
+        #cli { background: transparent; border: none; color: var(--primary); outline: none; flex: 1; font-family: inherit; }
+
+        @media (max-width: 900px) { body { grid-template-columns: 1fr; } .sidebar { display: none; } #cursor { display: none; } }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix-rain"></canvas>
+    <div id="cursor"></div>
+    <canvas id="grid-canvas"></canvas>
 
-    <div class="workspace">
-        <header class="panel header">
-            <div class="glitch-text">SUMIT_OS // SESSION_ACTIVE</div>
-            <div id="clock">00:00:00 UTC</div>
-        </header>
+    <header class="panel header">
+        <div><span style="color:var(--primary)">●</span> SUMIT_OS // NODE_CONNECTED</div>
+        <div id="clock">00:00:00 UTC</div>
+    </header>
 
-        <aside class="panel sidebar">
-            <div class="bio-box">
-                <div class="stat-label">Subject_Identity</div>
-                <div style="font-weight: 800;">SUMIT DAS</div>
-                <div style="font-size: 11px; opacity: 0.6;">JU '26 // SEC_ENG</div>
+    <aside class="panel sidebar">
+        <div>
+            <span class="skill-label">Subject_Identity</span>
+            <h2 style="font-weight: 800; letter-spacing: -1px;">SUMIT DAS</h2>
+            <p style="font-size: 12px; opacity: 0.5;">Jadavpur University '26</p>
+        </div>
+
+        <div>
+            <span class="skill-label">Hardware_Metrics</span>
+            <div class="skill-item">
+                <div style="display:flex; justify-content:space-between; font-size:10px;"><span>CYBER_SEC</span><span>94%</span></div>
+                <div class="bar-bg"><div class="bar-fill" style="width: 94%;"></div></div>
             </div>
-
-            <div class="stat-label">Security_Proficiency</div>
-            <div class="progress-rail"><div class="progress-fill" style="width: 94%"></div></div>
-
-            <div class="stat-label">Core_Development</div>
-            <div class="progress-rail"><div class="progress-fill" style="width: 88%"></div></div>
-
-            <div class="stat-label">System_Auditing</div>
-            <div class="progress-rail"><div class="progress-fill" style="width: 76%"></div></div>
-
-            <div style="margin-top: 40px;">
-                <div class="stat-label">Core_Navigation</div>
-                <div style="font-size: 11px; line-height: 2;">
-                    > <span class="highlight">ls</span> - List files<br>
-                    > <span class="highlight">cat</span> [file] - Read data<br>
-                    > <span class="highlight">help</span> - Cmd list<br>
-                    > <span class="highlight">clear</span> - Reset buffer
-                </div>
+            <div class="skill-item">
+                <div style="display:flex; justify-content:space-between; font-size:10px;"><span>SYSTEM_ARCH</span><span>88%</span></div>
+                <div class="bar-bg"><div class="bar-fill" style="width: 88%;"></div></div>
             </div>
-        </aside>
+        </div>
 
-        <section class="panel terminal">
-            <div id="output-stream">
-                <div>[SYSTEM]: Initializing secure handshake... <span class="highlight">DONE</span></div>
-                <div>[SYSTEM]: Virtualizing environment for Jadavpur_Node... <span class="highlight">OK</span></div>
-                <div>[SYSTEM]: Welcome, Operator. Access level: <span class="highlight">GUEST</span></div>
-                <br>
-                <div>Type <span class="highlight">'ls'</span> to view directory or <span class="highlight">'help'</span> for instructions.</div>
-                <br>
-            </div>
-            <div class="input-area">
-                <span>guest@sumit_os:~$</span>
-                <input type="text" id="cli-input" autofocus autocomplete="off">
-            </div>
-        </section>
+        <div style="margin-top: auto;">
+            <span class="skill-label">Quick_Uplink</span>
+            <a href="mailto:sumitdas712424@gmail.com" style="color:var(--primary); text-decoration:none; font-size:12px;">[ INITIALIZE_MAIL ]</a>
+        </div>
+    </aside>
 
-        <footer class="panel" style="padding: 0 20px; display: flex; align-items: center; font-size: 9px; opacity: 0.4;">
-            AES-256-GCM // DISTRO: JU_LINUX_V4 // PORT: 443
-        </footer>
-    </div>
+    <main class="panel main-view">
+        <h1 style="font-size: clamp(30px, 5vw, 70px); line-height: 0.8; margin-bottom: 40px;">Coder.<br><span style="color:var(--primary)">Breaker.</span><br>Builder.</h1>
+        
+        <div class="project-card">
+            <span class="skill-label">Project_Alpha</span>
+            <h3 style="margin: 5px 0;">NETWORK_SENTINEL_v1</h3>
+            <p style="font-size: 12px; opacity: 0.6;">Automated threat detection system built for high-traffic JU server nodes.</p>
+        </div>
+
+        <div class="terminal-input">
+            <span>guest@sumit_os:~$</span>
+            <input type="text" id="cli" placeholder="Type 'help'..." autofocus>
+        </div>
+    </main>
+
+    <footer class="panel footer">
+        <div>LOC: KOLKATA, IN</div>
+        <div>LATENCY: <span id="ping">24ms</span></div>
+        <div>STATUS: ENCRYPTED</div>
+    </footer>
 
     <script>
-        // --- 1. THE MATRIX ENGINE ---
-        const canvas = document.getElementById('matrix-rain');
+        // --- GRID ENGINE ---
+        const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const alphabet = "0101010101010101ABCDEF";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
-
-        function rain() {
-            ctx.fillStyle = "rgba(5, 6, 8, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#00ffaa";
-            ctx.font = fontSize + "px monospace";
-
-            drops.forEach((y, i) => {
-                const text = alphabet[Math.floor(Math.random() * alphabet.length)];
-                ctx.fillText(text, i * fontSize, y * fontSize);
-                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            });
+        function init() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         }
-        setInterval(rain, 40);
-
-        // --- 2. COMMAND LOGIC ---
-        const cliInput = document.getElementById('cli-input');
-        const output = document.getElementById('output-stream');
-
-        const fileSystem = {
-            "about.txt": "Sumit Das: A Cybersecurity specialist and developer at Jadavpur University. Focused on the intersection of offensive security and resilient architecture.",
-            "skills.sh": "LANGUAGES: [C++, Python, JavaScript, SQL, Bash] <br>TOOLS: [Linux, Docker, Git, BurpSuite, React, Node.js]",
-            "contact.log": "UPLINK: <a href='mailto:sumitdas712424@gmail.com' style='color:#00ffaa'>sumitdas712424@gmail.com</a>",
-            "secret.env": "<span class='secret-reveal'>[ROOT ACCESS REQUIRED]</span>"
-        };
-
-        const executeCommand = (cmd) => {
-            const args = cmd.split(' ');
-            const action = args[0];
-
-            switch(action) {
-                case 'help':
-                    return "Commands: <span class='highlight'>ls</span> (list files), <span class='highlight'>cat [file]</span> (read), <span class='highlight'>clear</span>, <span class='highlight'>sudo [name]</span>";
-                case 'ls':
-                    return Object.keys(fileSystem).join(' &nbsp; ');
-                case 'cat':
-                    const fileName = args[1];
-                    return fileSystem[fileName] || `cat: ${fileName}: No such file or directory`;
-                case 'sudo':
-                    if(args[1] === 'sumit') {
-                        document.querySelector('.glitch-text').innerText = "SUMIT_OS // ROOT_ACCESS";
-                        fileSystem["secret.env"] = "OVERDRIVE_PROTOCOLS: Disabling firewall... Initializing JU_Uplink... Total control achieved.";
-                        return "Access Granted. 'secret.env' decrypted.";
-                    }
-                    return "sudo: permission denied";
-                case 'clear':
-                    output.innerHTML = "";
-                    return "";
-                default:
-                    return `sh: command not found: ${action}`;
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.strokeStyle = "rgba(0, 255, 170, 0.1)";
+            ctx.lineWidth = 0.5;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
             }
-        };
-
-        cliInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = cliInput.value.trim();
-                const userLine = document.createElement('div');
-                userLine.innerHTML = `<span style="color:var(--primary)">guest@sumit_os:~$</span> ${cmd}`;
-                output.appendChild(userLine);
-
-                const result = executeCommand(cmd.toLowerCase());
-                if (result) {
-                    const resLine = document.createElement('div');
-                    resLine.innerHTML = `> ${result}`;
-                    output.appendChild(resLine);
-                }
-
-                cliInput.value = "";
-                output.scrollTop = output.scrollHeight;
+            for(let i=0; i<canvas.height; i+=40) {
+                ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke();
             }
+        }
+        window.addEventListener('resize', () => { init(); draw(); });
+        init(); draw();
+
+        // --- CURSOR ENGINE ---
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
         });
 
-        // --- 3. TEMPORAL SYNC ---
-        function sync() {
-            const d = new Date();
-            document.getElementById('clock').innerText = d.toUTCString().split(' ')[4] + " UTC";
-        }
-        setInterval(sync, 1000); sync();
+        // --- TIME & TELEMETRY ---
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toUTCString().split(' ')[4] + " UTC";
+            document.getElementById('ping').innerText = Math.floor(Math.random()*10 + 20) + "ms";
+        }, 1000);
+
+        // --- CLI LOGIC ---
+        const cli = document.getElementById('cli');
+        cli.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                if(cli.value.toLowerCase() === 'help') alert("Commands: about, projects, clear, contact");
+                cli.value = "";
+            }
+        });
     </script>
 </body>
 </html>
