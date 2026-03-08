@@ -1,91 +1,141 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMIT_DAS // SEC_ENGINEER</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;800&display=swap" rel="stylesheet">
+    <title>SUMIT_DAS // PORTFOLIO_v3</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00ffaa; --bg: #050608; --border: rgba(0, 255, 170, 0.2); --text: #e0e0e0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* CURSOR FIX: pointer-events: none ensures you can click buttons */
-        #cursor { position: fixed; width: 30px; height: 30px; border: 1px solid var(--primary); border-radius: 50%; pointer-events: none; z-index: 99999; transition: transform 0.1s ease-out; display: flex; align-items: center; justify-content: center; }
-        #cursor::after { content: ''; width: 4px; height: 4px; background: #fff; border-radius: 50%; }
+        body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; cursor: none; }
+        #cursor { position: fixed; width: 20px; height: 20px; border: 1px solid var(--primary); border-radius: 50%; pointer-events: none; z-index: 99999; transition: transform 0.05s linear; }
 
-        .header { height: 50px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 11px; background: rgba(0,0,0,0.5); }
-        .main-container { flex: 1; display: grid; grid-template-columns: 1fr 400px; gap: 1px; background: var(--border); overflow: hidden; }
-        .panel { background: var(--bg); padding: 40px; overflow-y: auto; }
-
-        .hero-title { font-size: clamp(40px, 8vw, 100px); font-weight: 800; line-height: 0.8; margin-bottom: 30px; }
-        .highlight { color: var(--primary); }
-
-        /* SKILLS DIAGNOSTIC */
+        /* HUD LAYOUT */
+        .hud-header { height: 50px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 11px; }
+        .main-frame { flex: 1; display: grid; grid-template-columns: 380px 1fr; gap: 1px; background: var(--border); overflow: hidden; }
+        
+        .panel { background: var(--bg); padding: 30px; overflow-y: auto; }
+        
+        /* SKILL BARS */
+        .stat-label { font-size: 10px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
         .skill-item { margin-bottom: 25px; }
-        .skill-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: var(--primary); }
-        .bar-rail { height: 2px; background: rgba(255,255,255,0.05); position: relative; }
-        .bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); width: 0; transition: width 2s cubic-bezier(0.19, 1, 0.22, 1); }
+        .bar-rail { height: 2px; background: rgba(255,255,255,0.05); margin-top: 8px; }
+        .bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); width: 0; transition: width 2s ease-in-out; }
 
-        .terminal-log { font-size: 11px; color: #707070; line-height: 1.8; margin-top: 40px; }
-        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } .side-panel { display: none; } #cursor { display: none; } * { cursor: auto !important; } }
+        /* TERMINAL */
+        #output { font-size: 13px; line-height: 1.6; color: #aaa; }
+        .input-line { display: flex; align-items: center; color: var(--primary); margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        #cli-input { background: transparent; border: none; color: var(--primary); outline: none; flex: 1; font-family: inherit; font-size: 15px; margin-left: 10px; }
+        
+        .highlight { color: var(--primary); }
+        .project-link { display: block; padding: 10px; border: 1px solid var(--border); margin: 10px 0; text-decoration: none; color: inherit; }
+        .project-link:hover { border-color: var(--primary); background: rgba(0,255,170,0.05); }
+
+        @media (max-width: 900px) { .main-frame { grid-template-columns: 1fr; } .sidebar { display: none; } #cursor { display: none; } * { cursor: auto !important; } }
     </style>
 </head>
 <body>
     <div id="cursor"></div>
-    <header class="header">
-        <div>STATUS: <span class="highlight">SECURE_UPLINK</span> // NODE: JU_KOLKATA</div>
+
+    <header class="hud-header">
+        <div>STATUS: <span class="highlight">CONNECTED</span> // NODE: JU_2026</div>
         <div id="clock">00:00:00 UTC</div>
     </header>
 
-    <div class="main-container">
-        <section class="panel">
-            <h1 class="hero-title">Coder.<br><span class="highlight">Breaker.</span><br>Builder.</h1>
-            <p style="opacity: 0.5; max-width: 500px;">Sumit Das. Jadavpur University '26. Engineering the future of zero-trust architectures and defensive systems.</p>
-            <div class="terminal-log" id="logs">> Handshake verified...<br>> Initializing system diagnostic...</div>
-        </section>
-
-        <aside class="panel side-panel" style="border-left: 1px solid var(--border);">
-            <div style="margin-bottom: 40px;"><span style="font-size: 10px; opacity: 0.5;">[ CORE_CAPABILITIES ]</span></div>
+    <div class="main-frame">
+        <aside class="panel sidebar">
+            <h2 style="font-size: 24px; margin-bottom: 30px;">SUMIT DAS</h2>
+            
             <div class="skill-item">
-                <div class="skill-label"><span>PENETRATION_TESTING</span><span>94%</span></div>
+                <div class="stat-label">Cyber_Security / Pen-Testing</div>
                 <div class="bar-rail"><div class="bar-fill" data-width="94%"></div></div>
             </div>
             <div class="skill-item">
-                <div class="skill-label"><span>SYSTEM_ARCHITECTURE</span><span>88%</span></div>
+                <div class="stat-label">C++ / Python / Java</div>
                 <div class="bar-rail"><div class="bar-fill" data-width="88%"></div></div>
             </div>
             <div class="skill-item">
-                <div class="skill-label"><span>OFFENSIVE_SECURITY</span><span>91%</span></div>
-                <div class="bar-rail"><div class="bar-fill" data-width="91%"></div></div>
+                <div class="stat-label">Full-Stack Architecture</div>
+                <div class="bar-rail"><div class="bar-fill" data-width="82%"></div></div>
             </div>
-            <a href="mailto:sumitdas712424@gmail.com" style="display:inline-block; margin-top:40px; color:var(--primary); text-decoration:none; border:1px solid var(--primary); padding:15px 30px; font-size:12px;">[ INITIALIZE_CONTACT ]</a>
+
+            <div style="margin-top: 40px;">
+                <div class="stat-label">Active_Uplinks</div>
+                <a href="mailto:sumitdas712424@gmail.com" style="color:var(--primary); font-size: 12px; text-decoration: none;">[ EMAIL_DIRECT ]</a>
+            </div>
         </aside>
+
+        <main class="panel terminal">
+            <div id="output">
+                <div>[SYSTEM]: Booting... <span class="highlight">SUCCESS</span></div>
+                <div>[SYSTEM]: Type <span class="highlight">'help'</span> to explore projects and data.</div>
+                <br>
+            </div>
+            
+            <div class="input-line">
+                <span>guest@sumit_os:~$</span>
+                <input type="text" id="cli-input" autofocus autocomplete="off">
+            </div>
+        </main>
     </div>
 
     <script>
+        const input = document.getElementById('cli-input');
+        const output = document.getElementById('output');
         const cursor = document.getElementById('cursor');
+
+        // Cursor logic
         document.addEventListener('mousemove', (e) => {
-            cursor.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
+            cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
         });
 
-        const logs = document.getElementById('logs');
-        const lines = ["AES-256 Handshake OK", "Bypassing firewalls...", "Protocol 443 active", "Neural grid synced", "Status: Optimal"];
-        setInterval(() => {
-            const l = document.createElement('div');
-            l.innerHTML = `> [${new Date().toLocaleTimeString()}] ${lines[Math.floor(Math.random()*lines.length)]}`;
-            logs.prepend(l);
-            if(logs.children.length > 6) logs.lastElementChild.remove();
-        }, 4000);
-
-        function updateClock() { document.getElementById('clock').innerText = new Date().toUTCString().split(' ')[4] + " UTC"; }
-        setInterval(updateClock, 1000); updateClock();
-
+        // Skill loader
         setTimeout(() => {
             document.querySelectorAll('.bar-fill').forEach(bar => {
                 bar.style.width = bar.getAttribute('data-width');
             });
-        }, 800);
+        }, 500);
+
+        // Clock
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toUTCString().split(' ')[4] + " UTC";
+        }, 1000);
+
+        // CLI COMMANDS
+        const commands = {
+            "help": "Commands: <br>- <span class='highlight'>projects</span> : View Github works <br>- <span class='highlight'>about</span> : Full bio <br>- <span class='highlight'>clear</span> : Reset screen",
+            "about": "Cybersecurity Scholar at Jadavpur University. Focused on network defense and offensive engineering.",
+            "projects": "LISTING ACTIVE PROJECTS:<br><a class='project-link' href='#'>[01] NETWORK_SENTINEL - Automated Threat Detection</a><a class='project-link' href='#'>[02] CRYPTO_VAULT - Secure Encryption Tool</a>",
+            "clear": ""
+        };
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = input.value.toLowerCase().trim();
+                const line = document.createElement('div');
+                line.innerHTML = `<span style="color:#555">guest@sumit_os:~$</span> ${input.value}`;
+                output.appendChild(line);
+
+                if (val === 'clear') {
+                    output.innerHTML = "";
+                } else if (commands[val]) {
+                    const res = document.createElement('div');
+                    res.innerHTML = `> ${commands[val]}`;
+                    output.appendChild(res);
+                } else if (val !== "") {
+                    const err = document.createElement('div');
+                    err.innerHTML = `> Protocol '${val}' not recognized.`;
+                    output.appendChild(err);
+                }
+
+                input.value = "";
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+        
+        document.addEventListener('click', () => input.focus());
     </script>
 </body>
 </html>
