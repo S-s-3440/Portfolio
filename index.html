@@ -3,248 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMIT // NEXUS_ZERO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=JetBrains+Mono:wght@200;400&display=swap" rel="stylesheet">
+    <title>SUMIT DAS // NEXUS_OVERDRIVE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=JetBrains+Mono:wght@200;500&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --accent: #00f2ff;
-            --bg: #050505;
-            --card: rgba(255, 255, 255, 0.03);
-            --border: rgba(0, 242, 255, 0.2);
-            --text: #e0e0e0;
+            /* DYNAMIC SCALING VARIABLES: Change the --primary hex to swap the UI accent */
+            --primary: #00ffaa; 
+            --bg: #030405;
+            --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #808080;
+            --glitch-speed: 0.2s;
         }
 
+        /* UI RESET: Disabling default cursor to enable the custom HUD-Logic system */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        body { background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; overflow: hidden; }
-
-        /* Background Particle Canvas */
-        #canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        /* Loader Overlay */
-        #loader {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-family: 'JetBrains Mono', monospace;
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden;
+            transition: background 0.5s ease;
         }
 
-        /* Scanline Effect */
-        .scanlines {
-            position: fixed; inset: 0; pointer-events: none; z-index: 9999;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 2px 100%;
+        /* 1. BACKGROUND ENGINE: Neural Network Simulation
+           Uses Canvas API to render real-time node connections. */
+        #network-canvas {
+            position: fixed; top: 0; left: 0; z-index: -1;
+            filter: blur(1px); opacity: 0.4;
         }
 
-        /* Custom Cursor */
-        #cursor {
-            width: 20px; height: 20px; border: 1px solid var(--accent); position: fixed;
-            pointer-events: none; z-index: 10001; transition: 0.1s; mix-blend-mode: difference;
+        /* 2. THE CUSTOM CURSOR HUD
+           Two-part system: A precise dot and a trailing 'scanner' ring. */
+        #cursor-dot {
+            position: fixed; width: 6px; height: 6px; background: #fff;
+            border-radius: 50%; pointer-events: none; z-index: 10001;
+        }
+        #cursor-ring {
+            position: fixed; width: 40px; height: 40px; border: 1px solid var(--primary);
+            border-radius: 50%; pointer-events: none; z-index: 10000;
+            transition: transform 0.15s ease-out, border 0.3s;
         }
 
-        /* Layout */
-        .wrapper { max-width: 1400px; margin: 0 auto; padding: 40px; opacity: 0; transition: 1s ease; }
-        .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
-
-        .panel {
-            background: var(--card); border: 1px solid var(--border); border-radius: 4px;
-            padding: 30px; backdrop-filter: blur(10px); position: relative; transition: 0.3s;
+        /* 3. CORE LAYOUT: Responsive Grid */
+        .main-container {
+            max-width: 1200px; margin: 0 auto; padding: 100px 40px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
         }
-        .panel:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); }
 
-        .hero { grid-column: span 8; }
-        .status { grid-column: span 4; font-family: 'JetBrains Mono'; font-size: 12px; }
-        .project { grid-column: span 4; height: 250px; }
-        .contact-box { grid-column: span 12; display: flex; justify-content: space-between; align-items: center; }
-
-        h1 { font-size: 4rem; text-transform: uppercase; line-height: 0.9; margin-bottom: 20px; }
-        .accent-text { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-
-        /* Form Styling */
-        input, textarea {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff;
-            padding: 10px; margin-bottom: 10px; width: 100%; font-family: 'JetBrains Mono';
+        .hero-title { font-size: clamp(40px, 8vw, 120px); font-weight: 800; line-height: 0.85; letter-spacing: -4px; }
+        
+        /* THE STRIKE EFFECT: Refined visual from the user-provided reference image */
+        .strike-text { color: var(--primary); position: relative; display: inline-block; }
+        .strike-text::after {
+            content: ""; position: absolute; left: 0; top: 50%; width: 110%; height: 6px;
+            background: var(--primary); box-shadow: 0 0 20px var(--primary);
         }
-        .btn {
-            background: var(--accent); color: #000; border: none; padding: 15px 30px;
-            font-weight: bold; text-transform: uppercase; transition: 0.3s;
-        }
-        .btn:hover { box-shadow: 0 0 20px var(--accent); transform: scale(1.05); }
 
-        /* Animations */
-        @keyframes blink { 50% { opacity: 0; } }
-        .cursor-blink { animation: blink 1s infinite; }
+        /* 4. HACKER MODE OVERLAY: Hidden binary stream */
+        #binary-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            color: var(--primary); font-family: 'JetBrains Mono'; font-size: 10px;
+            overflow: hidden; pointer-events: none; display: none; z-index: 9000;
+        }
+
+        /* 5. INTERACTIVE BENTO BLOCKS */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 40px; border-radius: 4px; backdrop-filter: blur(20px);
+            transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        
+        .tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 20px; display: block; letter-spacing: 2px;}
+
+        /* 6. HACKER SWITCH BUTTON */
+        #hacker-switch {
+            position: fixed; bottom: 40px; left: 40px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-dim); padding: 10px 20px; font-family: 'JetBrains Mono';
+            z-index: 10001; transition: 0.3s;
+        }
+        #hacker-switch:hover { color: var(--primary); border-color: var(--primary); }
+
+        .email-btn {
+            background: transparent; border: 1px solid var(--primary);
+            color: var(--primary); padding: 15px 30px; font-family: 'JetBrains Mono';
+            text-decoration: none; transition: 0.3s;
+        }
+        .email-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 30px var(--primary); }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+            #cursor-ring, #cursor-dot { display: none; }
+            * { cursor: auto !important; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div id="load-text" style="color: var(--accent);">[ INITIALIZING SYSTEM_CHECK ]</div>
-        <div id="progress-bar" style="width: 200px; height: 2px; background: #222; margin-top: 10px;">
-            <div id="progress-fill" style="width: 0%; height: 100%; background: var(--accent);"></div>
+    <div id="binary-overlay"></div>
+    <canvas id="network-canvas"></canvas>
+    
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <button id="hacker-switch" onclick="toggleHackerMode()">[ MODE: STABLE ]</button>
+
+    <main class="main-container">
+        <section>
+            <span class="tag">Jadavpur University // Engineering 2026</span>
+            <h1 class="hero-title" id="main-header">
+                Coder.<br>
+                <span class="strike-text">Breaker.</span><br>
+                Builder.
+            </h1>
+            <p style="margin-top: 40px; color: var(--text-dim); font-size: 18px; line-height: 1.6;">
+                I am <span style="color: #fff">Sumit Das</span>. A security-focused developer bridging the gap between <span class="strike-text" style="padding:0; font-size:18px;">vulnerability</span> and resilience.
+            </p>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card">
+                <span class="tag">SEC_LOG // 001</span>
+                <h2 style="font-size: 24px; margin-bottom: 10px;">VulnScanner_Core</h2>
+                <p style="color: var(--text-dim); font-size: 14px;">High-concurrency reconnaissance tool mapped with C++ backend logic.</p>
+            </div>
+            <div class="card">
+                <span class="tag">SEC_LOG // 002</span>
+                <h2 style="font-size: 24px; margin-bottom: 10px;">Nexus_Vault</h2>
+                <p style="color: var(--text-dim); font-size: 14px;">Implementation of AES-256-GCM encryption for distributed state management.</p>
+            </div>
+        </section>
+
+        <div style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 40px; margin-top: 60px;">
+            <div>
+                <h2 style="font-size: 32px;">Execute Link</h2>
+                <p style="color: var(--text-dim); font-family: 'JetBrains Mono';">GMAIL_UPLINK: ACTIVE</p>
+            </div>
+            <a href="mailto:sumitdas712424@gmail.com" class="email-btn">
+                sumitdas712424@gmail.com &rarr;
+            </a>
         </div>
-    </div>
-
-    <div id="cursor"></div>
-    <div class="scanlines"></div>
-    <canvas id="canvas"></canvas>
-
-    <div class="wrapper" id="main-content">
-        <div class="grid">
-            <div class="panel hero">
-                <p class="accent-text" style="font-size: 14px;">// SEC_PROTO_ENRTY: 2026</p>
-                <h1 id="scramble-name">SUMIT DAS</h1>
-                <p style="font-size: 18px; max-width: 600px; opacity: 0.7;">
-                    Security Architect & Full-Stack Developer at <span class="accent-text">Jadavpur University</span>. 
-                    Building digital fortresses and high-performance neural interfaces.
-                </p>
-            </div>
-
-            <div class="panel status">
-                <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">SYSTEM_METRICS</div>
-                <div>CPU_LOAD: <span class="accent-text">LOW</span></div>
-                <div>IP_ADDR: <span class="accent-text">192.168.1.X</span></div>
-                <div>UPLINK: <span class="accent-text">STABLE</span></div>
-                <div style="margin-top: 40px; font-size: 10px; opacity: 0.5;">
-                    [ LOG: Attempting secure connection to sumitdas712424@gmail.com... SUCCESS ]
-                </div>
-            </div>
-
-            <div class="panel project">
-                <span class="accent-text">01.</span>
-                <h3>VULN_SCAN</h3>
-                <p style="font-size: 14px; opacity: 0.6; margin-top: 10px;">Automated reconnaissance tool using Python and Nmap APIs.</p>
-            </div>
-
-            <div class="panel project">
-                <span class="accent-text">02.</span>
-                <h3>ALGO_CORE</h3>
-                <p style="font-size: 14px; opacity: 0.6; margin-top: 10px;">C++ high-concurrency data processing engine.</p>
-            </div>
-
-            <div class="panel project">
-                <span class="accent-text">03.</span>
-                <h3>ENCRYPT_MAIL</h3>
-                <p style="font-size: 14px; opacity: 0.6; margin-top: 10px;">End-to-end encrypted messaging service concept.</p>
-            </div>
-
-            <div class="panel contact-box">
-                <div>
-                    <h2>CONNECT_DIRECT</h2>
-                    <a href="mailto:sumitdas712424@gmail.com" class="accent-text" style="text-decoration: none;">sumitdas712424@gmail.com</a>
-                </div>
-                <form action="https://formspree.io/f/sumitdas712424@gmail.com" method="POST" style="width: 400px;">
-                    <input type="email" name="email" placeholder="YOUR_EMAIL" required>
-                    <textarea name="message" placeholder="MESSAGE_CONTENT" rows="3"></textarea>
-                    <button type="submit" class="btn">Execute Transmission</button>
-                </form>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script>
-        // 1. LOADING SEQUENCE
-        const progress = document.getElementById('progress-fill');
-        const loader = document.getElementById('loader');
-        const main = document.getElementById('main-content');
-        let width = 0;
-
-        const loadInterval = setInterval(() => {
-            width += Math.random() * 10;
-            if (width >= 100) {
-                width = 100;
-                clearInterval(loadInterval);
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => { 
-                        loader.style.display = 'none'; 
-                        main.style.opacity = '1';
-                        body.style.overflow = 'auto';
-                    }, 500);
-                }, 500);
-            }
-            progress.style.width = width + '%';
-        }, 100);
-
-        // 2. PARTICLE NETWORK CANVAS
-        const canvas = document.getElementById('canvas');
+        /**
+         * LOGIC BLOCK 1: THE NEURAL NETWORK
+         * Generates particles that connect via lines when proximity thresholds are met.
+         */
+        const canvas = document.getElementById('network-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         let particles = [];
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = Array.from({ length: 60 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: Math.random() * 0.4 - 0.2,
+                vy: Math.random() * 0.4 - 0.2
+            }));
         }
 
-        function init() {
-            for (let i = 0; i < 80; i++) particles.push(new Particle());
-        }
-
-        function animate() {
+        function animateNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((p, index) => {
-                p.update();
-                p.draw();
-                // Connect lines
-                for (let j = index; j < particles.length; j++) {
-                    const dx = p.x - particles[j].x;
-                    const dy = p.y - particles[j].y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 150) {
-                        ctx.strokeStyle = `rgba(0, 242, 255, ${1 - dist/150})`;
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                
+                particles.slice(i + 1).forEach(p2 => {
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(dist < 150) {
+                        ctx.strokeStyle = `rgba(0, 255, 170, ${1 - dist/150})`;
                         ctx.lineWidth = 0.5;
-                        ctx.beginPath(); ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
                     }
-                }
+                });
             });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateNetwork);
         }
-        init(); animate();
+        initCanvas(); animateNetwork();
 
-        // 3. CURSOR LOGIC
-        const cursor = document.getElementById('cursor');
+        /**
+         * LOGIC BLOCK 2: THE CUSTOM CURSOR
+         * Maps DOM elements to pointer coordinates.
+         */
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+            dot.style.left = `${e.clientX - 3}px`;
+            dot.style.top = `${e.clientY - 3}px`;
+            ring.style.left = `${e.clientX - 20}px`;
+            ring.style.top = `${e.clientY - 20}px`;
         });
 
-        // 4. TEXT SCRAMBLE
-        const scramble = document.getElementById('scramble-name');
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*";
-        let originalText = scramble.innerText;
+        /**
+         * LOGIC BLOCK 3: HACKER MODE (THE 'WOW' FACTOR)
+         * Triggers a visual 'system breach' by generating binary strings.
+         */
+        let isHackerMode = false;
+        function toggleHackerMode() {
+            isHackerMode = !isHackerMode;
+            const overlay = document.getElementById('binary-overlay');
+            const btn = document.getElementById('hacker-switch');
+            
+            if(isHackerMode) {
+                overlay.style.display = 'block';
+                btn.innerText = "[ MODE: BREACHED ]";
+                btn.style.color = "var(--primary)";
+                startBinaryRain();
+            } else {
+                overlay.style.display = 'none';
+                btn.innerText = "[ MODE: STABLE ]";
+                btn.style.color = "var(--text-dim)";
+            }
+        }
 
-        scramble.onmouseover = () => {
-            let iteration = 0;
-            const interval = setInterval(() => {
-                scramble.innerText = originalText.split("").map((l, i) => {
-                    if(i < iteration) return originalText[i];
-                    return letters[Math.floor(Math.random() * 40)]
-                }).join("");
-                if(iteration >= originalText.length) clearInterval(interval);
-                iteration += 1/3;
-            }, 30);
-        };
+        function startBinaryRain() {
+            const overlay = document.getElementById('binary-overlay');
+            let binary = "";
+            for(let i=0; i<1000; i++) binary += Math.round(Math.random());
+            overlay.innerText = binary;
+            if(isHackerMode) setTimeout(startBinaryRain, 50);
+        }
+
+        // Hover expansions for cursor
+        document.querySelectorAll('.card, .email-btn, #hacker-switch').forEach(el => {
+            el.onmouseenter = () => ring.style.transform = "scale(1.8)";
+            el.onmouseleave = () => ring.style.transform = "scale(1)";
+        });
     </script>
 </body>
 </html>
