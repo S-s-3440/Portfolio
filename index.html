@@ -3,358 +3,441 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sumit Das — Portfolio</title>
+  <title>Sumit Das — Cybersecurity & Dev Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  
   <style>
+    /* =========================================
+       1. GLOBAL VARIABLES (THEME SETTINGS)
+       Change these colors to update the whole site's theme!
+       ========================================= */
     :root {
-      --bg: #080b10;
-      --surface: #0e1318;
-      --border: #1c2530;
-      --accent: #00ffa3;
-      --accent2: #0af;
-      --muted: #3a4a5c;
-      --text: #cdd8e3;
-      --text-dim: #5a7080;
-      --glow: 0 0 30px rgba(0,255,163,0.18);
+      --bg: #05080c;           /* Main background color (very dark blue/black) */
+      --surface: #0a0e14;      /* Slightly lighter background for cards/sections */
+      --border: #16202c;       /* Border color for separating elements */
+      --accent: #00ffa3;       /* Main hacker green color */
+      --accent-hover: #00cc82; /* Slightly darker green for hover effects */
+      --muted: #2d3b4d;        /* Dark grey for subtle elements */
+      --text: #cdd8e3;         /* Main text color (light grey) */
+      --text-dim: #6b8299;     /* Dimmed text color for secondary info */
+      --glow: 0 0 20px rgba(0, 255, 163, 0.2); /* Neon glow effect for buttons/cards */
     }
 
+    /* Reset default margins and padding for all elements */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Makes anchor links smoothly scroll to their sections */
     html { scroll-behavior: smooth; }
 
+    /* =========================================
+       2. BASE BODY STYLES & BACKGROUND
+       ========================================= */
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'DM Mono', monospace;
+      font-family: 'DM Mono', monospace; /* Default font for the whole site */
       font-size: 15px;
       line-height: 1.7;
-      overflow-x: hidden;
-      cursor: none;
+      overflow-x: hidden; /* Prevents horizontal scrolling */
+      cursor: none; /* Hides the default mouse cursor so we can use our custom one */
     }
 
-    /* Custom Cursor */
+    /* The tiny green dot that follows your mouse immediately */
     .cursor {
-      width: 10px; height: 10px;
+      width: 8px; height: 8px;
       background: var(--accent); border-radius: 50%;
       position: fixed; top: 0; left: 0;
       pointer-events: none; z-index: 9999;
-      transition: transform 0.15s ease;
-      mix-blend-mode: exclusion;
-    }
-    .cursor-ring {
-      width: 36px; height: 36px;
-      border: 1.5px solid var(--accent); border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9998;
-      transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.3s;
-      opacity: 0.5;
+      transform: translate(-50%, -50%); /* Centers the dot on the cursor coordinates */
     }
 
-    /* Noise + Grid */
+    /* The outer ring that smoothly trails the dot */
+    .cursor-ring {
+      width: 40px; height: 40px;
+      border: 1px solid var(--accent); border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, background 0.3s; /* Smooth animation when it changes size */
+    }
+
+    /* The class added by JavaScript when hovering over a clickable item */
+    .cursor-ring.hover {
+      width: 60px; height: 60px;
+      background: rgba(0, 255, 163, 0.1);
+      border-color: transparent;
+    }
+
+    /* Cyberpunk static noise background effect */
     body::before {
       content: '';
       position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; 
     }
+
+    /* Subtle grid lines background effect */
     body::after {
       content: '';
       position: fixed; inset: 0;
       background-image:
-        linear-gradient(rgba(0,255,163,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,163,0.025) 1px, transparent 1px);
-      background-size: 60px 60px;
+        linear-gradient(rgba(0,255,163,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,163,0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
       pointer-events: none; z-index: 0;
     }
 
-    /* NAV */
+    /* =========================================
+       3. NAVIGATION BAR
+       ========================================= */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       padding: 20px 60px;
       display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(28,37,48,0.6);
-      background: rgba(8,11,16,0.85);
-      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(22, 32, 44, 0.8);
+      background: rgba(5, 8, 12, 0.8);
+      backdrop-filter: blur(12px); /* Creates the frosted glass effect */
     }
+    
     .nav-logo {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
       color: var(--accent); text-decoration: none; letter-spacing: -0.5px;
+      position: relative;
     }
     .nav-logo span { color: var(--text-dim); }
+    
+    /* Glitch Animation for the Logo on hover */
+    .nav-logo:hover { animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; }
+    @keyframes glitch {
+      0% { transform: translate(0) }
+      20% { transform: translate(-2px, 2px) }
+      40% { transform: translate(-2px, -2px) }
+      60% { transform: translate(2px, 2px) }
+      80% { transform: translate(2px, -2px) }
+      100% { transform: translate(0) }
+    }
+
+    /* Nav Links styling */
     .nav-links { display: flex; gap: 36px; list-style: none; }
     .nav-links a {
       color: var(--text-dim); text-decoration: none;
-      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
-      transition: color 0.2s; position: relative;
+      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+      transition: color 0.3s; position: relative;
     }
+    /* The animated underline on nav links */
     .nav-links a::after {
-      content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 1px;
-      background: var(--accent); transform: scaleX(0); transform-origin: left;
+      content: ''; position: absolute; bottom: -6px; left: 0; right: 0; height: 2px;
+      background: var(--accent); transform: scaleX(0); transform-origin: right;
       transition: transform 0.3s ease;
     }
     .nav-links a:hover { color: var(--accent); }
-    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
-    /* HERO */
+    /* =========================================
+       4. HERO SECTION (Top of the page)
+       ========================================= */
     #hero {
-      min-height: 100vh;
+      min-height: 100vh; /* Takes up the full height of the screen */
       display: flex; align-items: center;
       padding: 120px 60px 60px;
       position: relative; overflow: hidden;
     }
+    
+    /* The large soft green gradient circle behind the text */
     .hero-glow {
-      position: absolute; width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(0,255,163,0.07) 0%, transparent 70%);
-      top: 50%; left: 40%; transform: translate(-50%, -55%);
+      position: absolute; width: 50vw; height: 50vw;
+      background: radial-gradient(circle, rgba(0,255,163,0.05) 0%, transparent 60%);
+      top: 50%; left: 30%; transform: translate(-50%, -50%);
       pointer-events: none;
     }
-    .hero-glow2 {
-      position: absolute; width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(0,170,255,0.05) 0%, transparent 70%);
-      top: 20%; left: 70%; pointer-events: none;
-    }
+    
     .hero-content { position: relative; z-index: 1; max-width: 900px; }
+    
     .hero-label {
-      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--accent); margin-bottom: 24px;
       display: flex; align-items: center; gap: 12px;
     }
     .hero-label::before {
-      content: ''; display: inline-block; width: 32px; height: 1px; background: var(--accent);
+      content: ''; display: inline-block; width: 40px; height: 1px; background: var(--accent);
     }
+    
     .hero-title {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(52px, 8vw, 110px);
-      font-weight: 800; line-height: 0.95;
-      letter-spacing: -3px; color: #fff; margin-bottom: 32px;
+      font-size: clamp(48px, 8vw, 100px); /* Scales automatically based on screen width */
+      font-weight: 800; line-height: 1;
+      letter-spacing: -2px; color: #fff; margin-bottom: 32px;
     }
-    .hero-title .line { display: block; overflow: hidden; }
-    .hero-title .word {
-      display: inline-block;
-      animation: slideUp 0.9s cubic-bezier(.22,1,.36,1) both;
-    }
-    .hero-title .word:nth-child(2) { animation-delay: 0.1s; }
-    .hero-title .dim { color: var(--muted); }
-    @keyframes slideUp {
-      from { transform: translateY(110%); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
+    
+    /* Strikethrough text effect for 'Breaker.' */
+    .hero-title .dim { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--accent); }
+    
     .hero-desc {
-      max-width: 480px; color: var(--text-dim); font-size: 14px; line-height: 1.8;
-      margin-bottom: 48px; animation: fadeIn 1s 0.5s both;
+      max-width: 500px; color: var(--text-dim); font-size: 15px; line-height: 1.8;
+      margin-bottom: 48px;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .hero-cta {
-      display: flex; gap: 20px; align-items: center;
-      animation: fadeIn 1s 0.7s both;
-    }
+    .hero-desc strong { color: #fff; font-weight: 400; }
+    
+    /* Call to Action Buttons */
+    .hero-cta { display: flex; gap: 24px; align-items: center; }
+    
     .btn-primary {
-      background: var(--accent); color: #000;
+      background: transparent; color: var(--accent);
+      border: 1px solid var(--accent);
       padding: 14px 32px; text-decoration: none;
-      font-family: 'Syne', sans-serif; font-weight: 700;
-      font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
-      transition: transform 0.2s, box-shadow 0.2s;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+      transition: all 0.3s; position: relative; overflow: hidden;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow); }
+    /* Button background slide animation */
+    .btn-primary::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: var(--accent); transition: all 0.3s; z-index: -1;
+    }
+    .btn-primary:hover { color: #000; box-shadow: var(--glow); }
+    .btn-primary:hover::before { left: 0; }
+    
     .btn-ghost {
       color: var(--text-dim); text-decoration: none;
-      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
-      border-bottom: 1px solid var(--border); padding-bottom: 2px;
-      transition: color 0.2s, border-color 0.2s;
+      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+      border-bottom: 1px solid transparent; padding-bottom: 2px;
+      transition: all 0.3s;
     }
-    .btn-ghost:hover { color: var(--accent); border-color: var(--accent); }
-    .hero-stats {
-      position: absolute; right: 60px; bottom: 60px;
-      display: flex; gap: 48px; animation: fadeIn 1s 0.9s both;
-    }
-    .stat { text-align: right; }
-    .stat-num {
-      font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: 36px; color: #fff; line-height: 1; display: block;
-    }
-    .stat-num span { color: var(--accent); }
-    .stat-label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .btn-ghost:hover { color: #fff; border-color: var(--accent); }
 
-    /* SECTIONS */
-    section { padding: 100px 60px; position: relative; z-index: 1; }
+    /* =========================================
+       5. GENERAL SECTION STYLING (Used across About, Portfolio, etc.)
+       ========================================= */
+    section { padding: 120px 60px; position: relative; z-index: 1; }
+    
     .section-label {
-      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--accent); margin-bottom: 16px;
       display: flex; align-items: center; gap: 12px;
     }
     .section-label::before {
-      content: ''; display: inline-block; width: 32px; height: 1px; background: var(--accent);
+      content: ''; display: inline-block; width: 40px; height: 1px; background: var(--accent);
     }
+    
     .section-title {
       font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: clamp(32px, 5vw, 60px);
-      letter-spacing: -2px; color: #fff; line-height: 1; margin-bottom: 60px;
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: -1.5px; color: #fff; line-height: 1; margin-bottom: 60px;
     }
 
-    /* ABOUT */
+    /* =========================================
+       6. ABOUT SECTION & TERMINAL WINDOW
+       ========================================= */
     #about {
       border-top: 1px solid var(--border);
       display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
     }
-    .about-text p {
-      color: var(--text-dim); font-size: 14px; line-height: 1.9; margin-bottom: 20px;
-    }
+    .about-text p { color: var(--text-dim); font-size: 15px; line-height: 1.9; margin-bottom: 20px; }
     .about-text p strong { color: var(--accent); font-weight: 400; }
-    .about-card {
-      background: var(--surface); border: 1px solid var(--border); padding: 32px;
-      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    
+    /* Terminal Card UI Styling */
+    .terminal-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    .about-card-line {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    .terminal-header {
+      background: #1a2330; padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
     }
-    .about-card-line:last-child { border-bottom: none; }
-    .about-card-line .key { color: var(--text-dim); }
-    .about-card-line .val { color: var(--accent); }
+    /* Mac-style window dots */
+    .terminal-header .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+    .terminal-header .title { margin-left: auto; margin-right: auto; font-size: 12px; color: var(--text-dim); }
+    
+    /* Terminal Code Text Styling */
+    .terminal-body { padding: 24px; font-size: 14px; line-height: 1.6; }
+    .terminal-body .prompt { color: var(--accent); margin-right: 8px; }
+    .terminal-body .cmd { color: #fff; }
+    .terminal-body .out { color: var(--text-dim); margin-bottom: 16px; margin-left: 20px;}
+    .terminal-body .string { color: #f1fa8c; }
 
-    /* PROJECTS */
+    /* =========================================
+       7. PORTFOLIO / PROJECTS GRID
+       ========================================= */
     #portfolio { border-top: 1px solid var(--border); }
-    .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    
+    /* CSS Grid automatically wraps cards to new rows when space runs out */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    
     .project-card {
-      background: var(--surface); padding: 36px;
+      background: var(--surface); padding: 40px 32px;
       border: 1px solid var(--border);
       position: relative; overflow: hidden;
-      transition: border-color 0.3s, transform 0.3s; cursor: none;
+      transition: all 0.4s ease; /* Smooth hover transition */
     }
+    
+    /* The animated green line that appears at the top of a card on hover */
     .project-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(0,255,163,0.04) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.3s;
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: var(--accent); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s ease;
     }
-    .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-    .project-card:hover::before { opacity: 1; }
+    .project-card:hover { transform: translateY(-8px); border-color: #2a3847; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .project-card:hover::before { transform: scaleX(1); }
+    
     .project-num {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 48px;
-      color: var(--border); line-height: 1; margin-bottom: 20px; transition: color 0.3s;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 40px;
+      color: var(--border); line-height: 1; margin-bottom: 24px; transition: color 0.4s;
     }
-    .project-card:hover .project-num { color: rgba(0,255,163,0.15); }
+    .project-card:hover .project-num { color: rgba(0,255,163,0.2); }
+    
     .project-tag {
-      display: inline-block; padding: 3px 10px;
-      background: rgba(0,255,163,0.08); border: 1px solid rgba(0,255,163,0.2);
+      display: inline-block; padding: 4px 12px;
+      background: rgba(0,255,163,0.05); border: 1px solid rgba(0,255,163,0.2);
       color: var(--accent); font-size: 10px; letter-spacing: 0.15em;
       text-transform: uppercase; margin-bottom: 16px;
     }
-    .project-name {
-      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px;
-      color: #fff; margin-bottom: 12px; letter-spacing: -0.5px;
-    }
-    .project-desc { color: var(--text-dim); font-size: 13px; line-height: 1.7; margin-bottom: 24px; }
+    
+    .project-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 24px; color: #fff; margin-bottom: 12px; }
+    .project-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+    
     .project-stack { display: flex; gap: 8px; flex-wrap: wrap; }
     .project-stack span {
-      font-size: 10px; color: var(--muted);
-      border: 1px solid var(--border); padding: 2px 8px; letter-spacing: 0.08em;
+      font-size: 11px; color: var(--text-dim);
+      background: var(--bg); padding: 4px 10px; border-radius: 4px;
     }
+    
+    /* The arrow icon button inside project cards */
     .project-link {
-      position: absolute; top: 36px; right: 36px;
-      width: 32px; height: 32px; border: 1px solid var(--border);
+      position: absolute; top: 32px; right: 32px;
+      width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      color: var(--text-dim); text-decoration: none; font-size: 14px; transition: all 0.2s;
+      color: var(--text-dim); text-decoration: none; font-size: 16px; transition: all 0.3s;
     }
-    .project-card:hover .project-link { background: var(--accent); color: #000; border-color: var(--accent); }
+    .project-card:hover .project-link { background: var(--accent); color: #000; border-color: var(--accent); transform: rotate(45deg); }
 
-    /* SKILLS */
+    /* =========================================
+       8. SKILLS SECTION
+       ========================================= */
     #skills { border-top: 1px solid var(--border); }
-    .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
-    .skill-group { margin-bottom: 40px; }
+    .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+    .skill-group { margin-bottom: 48px; }
     .skill-group-name {
-      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--text-dim); margin-bottom: 20px;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text); margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 8px;
     }
-    .skill-item { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-    .skill-name { font-size: 13px; color: var(--text); min-width: 140px; }
-    .skill-bar { flex: 1; height: 2px; background: var(--border); position: relative; overflow: hidden; }
+    .skill-item { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .skill-name { font-size: 14px; color: var(--text-dim); min-width: 140px; }
+    
+    /* The background of the progress bar */
+    .skill-bar { flex: 1; height: 4px; background: var(--surface); position: relative; border-radius: 2px; overflow: hidden; }
+    
+    /* The green fill of the progress bar (Width is set via JavaScript) */
     .skill-bar-fill {
       position: absolute; left: 0; top: 0; bottom: 0;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      width: 0%; transition: width 1.2s cubic-bezier(.22,1,.36,1);
+      background: var(--accent); box-shadow: var(--glow);
+      width: 0%; transition: width 1.5s cubic-bezier(.22,1,.36,1);
     }
-    .skill-pct { font-size: 11px; color: var(--text-dim); min-width: 32px; text-align: right; }
-    .tools-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+    
+    .skill-pct { font-size: 12px; color: var(--accent); min-width: 36px; text-align: right; }
+    
+    /* Cloud of tool badges */
+    .tools-cloud { display: flex; flex-wrap: wrap; gap: 12px; }
     .tool-badge {
       padding: 8px 16px; background: var(--surface); border: 1px solid var(--border);
-      color: var(--text-dim); font-size: 12px; transition: all 0.2s;
-      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      color: var(--text-dim); font-size: 13px; transition: all 0.3s;
     }
-    .tool-badge:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,163,0.05); }
+    .tool-badge:hover { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
 
-    /* CONTACT */
+    /* =========================================
+       9. CONTACT SECTION & FORM
+       ========================================= */
     #contact {
       border-top: 1px solid var(--border);
       display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
     }
     .contact-big {
       font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: clamp(36px, 5vw, 64px);
-      letter-spacing: -2px; color: #fff; line-height: 0.95; margin-bottom: 32px;
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: -2px; color: #fff; line-height: 1; margin-bottom: 24px;
     }
     .contact-big .accent { color: var(--accent); }
-    .contact-email { font-size: 14px; color: var(--text-dim); margin-bottom: 32px; }
+    
+    .contact-email { font-size: 16px; color: var(--text-dim); margin-bottom: 40px; }
     .contact-email a {
       color: var(--accent); text-decoration: none;
-      border-bottom: 1px solid rgba(0,255,163,0.3); transition: border-color 0.2s;
+      border-bottom: 1px dashed var(--accent); padding-bottom: 2px; transition: opacity 0.3s;
     }
-    .contact-email a:hover { border-color: var(--accent); }
+    .contact-email a:hover { opacity: 0.7; }
+    
     .social-links { display: flex; gap: 16px; }
     .social-link {
-      padding: 10px 20px; border: 1px solid var(--border);
-      color: var(--text-dim); text-decoration: none; font-size: 12px;
-      letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.2s;
+      padding: 12px 24px; border: 1px solid var(--border);
+      color: var(--text); text-decoration: none; font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.3s;
     }
-    .social-link:hover { border-color: var(--accent); color: var(--accent); }
-    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,163,0.05); }
+    
+    /* Contact Form Styling */
+    .contact-form { display: flex; flex-direction: column; gap: 24px; background: var(--surface); padding: 40px; border: 1px solid var(--border); }
     .form-group { display: flex; flex-direction: column; gap: 8px; }
-    .form-group label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; }
+    .form-group label { font-size: 12px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    
     .form-group input, .form-group textarea {
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
-      padding: 14px 16px; outline: none; transition: border-color 0.2s; resize: none;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px;
+      padding: 16px; outline: none; transition: border-color 0.3s; resize: none; /* resize: none stops user from dragging text box corners */
     }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
-    .form-group textarea { height: 120px; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
+    .form-group textarea { height: 140px; }
+    
     .btn-submit {
-      background: transparent; border: 1px solid var(--accent);
-      color: var(--accent); font-family: 'DM Mono', monospace;
-      font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
-      padding: 14px 32px; cursor: none; transition: all 0.2s; align-self: flex-start;
+      background: var(--accent); color: #000; border: none;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 16px; transition: all 0.3s; cursor: none; margin-top: 8px;
     }
-    .btn-submit:hover { background: var(--accent); color: #000; }
+    .btn-submit:hover { background: var(--accent-hover); box-shadow: var(--glow); }
 
-    /* FOOTER */
+    /* =========================================
+       10. FOOTER
+       ========================================= */
     footer {
-      border-top: 1px solid var(--border); padding: 32px 60px;
+      border-top: 1px solid var(--border); padding: 40px 60px;
       display: flex; justify-content: space-between; align-items: center;
-      position: relative; z-index: 1;
+      position: relative; z-index: 1; background: var(--surface);
     }
-    .footer-left { font-size: 12px; color: var(--text-dim); }
-    .footer-right { font-size: 12px; color: var(--muted); }
+    .footer-left { font-size: 13px; color: var(--text-dim); }
+    .footer-right { font-size: 13px; color: var(--muted); }
 
-    /* SCROLL ANIMATIONS */
+    /* =========================================
+       11. SCROLL REVEAL ANIMATION CLASSES
+       Used in conjunction with the Javascript Intersection Observer
+       ========================================= */
+    /* Hidden state */
     .reveal {
-      opacity: 0; transform: translateY(30px);
+      opacity: 0; transform: translateY(40px);
       transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
     }
-    .reveal.visible { opacity: 1; transform: none; }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
+    /* Visible state (JS adds this class) */
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    /* Delay classes to create staggered fade-ins */
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
 
+    /* =========================================
+       12. MOBILE RESPONSIVE QUERIES
+       Adjusts layout when screen width is 900px or less
+       ========================================= */
     @media (max-width: 900px) {
       nav { padding: 20px 24px; }
       section { padding: 80px 24px; }
-      #hero { padding: 120px 24px 80px; }
-      #about, #contact { grid-template-columns: 1fr; gap: 48px; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .skills-layout { grid-template-columns: 1fr; }
-      .hero-stats { position: static; margin-top: 48px; justify-content: flex-start; }
-      footer { flex-direction: column; gap: 8px; text-align: center; }
+      #hero { padding: 140px 24px 80px; }
+      /* Changes grid layouts to stack vertically on mobile */
+      #about, #contact, .skills-layout { grid-template-columns: 1fr; gap: 48px; }
+      .contact-form { padding: 24px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
+      
+      /* Disable custom cursor on mobile touch screens */
+      .cursor, .cursor-ring { display: none; } 
+      body { cursor: auto; }
+      .btn-submit { cursor: pointer; }
     }
   </style>
 </head>
@@ -363,101 +446,78 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- NAV -->
   <nav>
     <a class="nav-logo" href="#hero">SUMIT<span>.dev</span></a>
     <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#portfolio">Work</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#about" class="hover-target">About</a></li>
+      <li><a href="#portfolio" class="hover-target">Work</a></li>
+      <li><a href="#skills" class="hover-target">Skills</a></li>
+      <li><a href="#contact" class="hover-target">Contact</a></li>
     </ul>
   </nav>
 
-  <!-- HERO -->
   <section id="hero">
     <div class="hero-glow"></div>
-    <div class="hero-glow2"></div>
     <div class="hero-content">
-      <div class="hero-label">Sumit Das · Jadavpur University · 2026</div>
-      <h1 class="hero-title">
-        <span class="line"><span class="word">Coder.</span></span>
-        <span class="line"><span class="word">Hacker.</span></span>
-        <span class="line"><span class="word dim">Builder.</span></span>
+      <div class="hero-label reveal">Jadavpur University · Class of 2026</div>
+      <h1 class="hero-title reveal delay-1">
+        Coder.<br/>
+        Hacker.<br/>
+        <span class="dim">Breaker.</span> Builder.
       </h1>
-      <p class="hero-desc">
-        Engineering student at Jadavpur University passionate about programming and cybersecurity. I build with C++, Python, C & Java — and explore the world of ethical hacking.
+      <p class="hero-desc reveal delay-2">
+        I'm <strong>Sumit Das</strong>, an engineering student passionate about systems, programming, and cybersecurity. I build robust applications and explore the intricacies of ethical hacking.
       </p>
-      <div class="hero-cta">
-        <a href="#portfolio" class="btn-primary">View My Work</a>
-        <a href="#contact" class="btn-ghost">Get in touch →</a>
-      </div>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-num">4<span>+</span></span>
-        <span class="stat-label">Languages</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">∞</span>
-        <span class="stat-label">Curiosity</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">1<span>x</span></span>
-        <span class="stat-label">Hacker</span>
+      <div class="hero-cta reveal delay-2">
+        <a href="#portfolio" class="btn-primary hover-target">Deploy Projects</a>
+        <a href="#contact" class="btn-ghost hover-target">Initiate Contact →</a>
       </div>
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="about">
     <div class="about-text reveal">
-      <div class="section-label">About Me</div>
-      <h2 class="section-title">Who I<br/>Am</h2>
-      <p>I'm <strong>Sumit Das</strong>, an engineering student at <strong>Jadavpur University</strong> with a deep passion for programming and cybersecurity.</p>
-      <p>I code in <strong>C++, Python, C and Java</strong> — building projects, solving problems, and constantly pushing myself to learn more about how systems work.</p>
-      <p>I'm also driven by <strong>ethical hacking</strong> — understanding vulnerabilities, thinking like an attacker, and making the digital world a safer place.</p>
+      <div class="section-label">System.info</div>
+      <h2 class="section-title">Who I Am</h2>
+      <p>I am an engineering student at <strong>Jadavpur University</strong> with a deep passion for writing clean code and discovering system vulnerabilities.</p>
+      <p>My toolkit primarily revolves around <strong>C++, Python, C and Java</strong>. Whether it's crafting an efficient algorithm, building full-stack applications, or scripting network tools, I love seeing lines of code turn into reality.</p>
+      <p>Beyond traditional development, I am heavily invested in <strong>ethical hacking</strong>. I analyze network security, compete in CTFs, and continuously train to think like an attacker to build safer digital environments.</p>
     </div>
-    <div class="about-visual reveal reveal-delay-2">
-      <div class="about-card">
-        <div class="about-card-line">
-          <span class="key">// name</span>
-          <span class="val">Sumit Das</span>
+    
+    <div class="about-visual reveal delay-1">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">sumit@kali:~</div>
         </div>
-        <div class="about-card-line">
-          <span class="key">// university</span>
-          <span class="val">Jadavpur University</span>
-        </div>
-        <div class="about-card-line">
-          <span class="key">// status</span>
-          <span class="val">● Student</span>
-        </div>
-        <div class="about-card-line">
-          <span class="key">// languages</span>
-          <span class="val">C++, Python, C, Java</span>
-        </div>
-        <div class="about-card-line">
-          <span class="key">// specialty</span>
-          <span class="val">Ethical Hacking</span>
-        </div>
-        <div class="about-card-line">
-          <span class="key">// open_to</span>
-          <span class="val">Internships & Projects</span>
+        <div class="terminal-body">
+          <p><span class="prompt">root@kali:~#</span> <span class="cmd">whoami</span></p>
+          <p class="out">Sumit Das</p>
+          
+          <p><span class="prompt">root@kali:~#</span> <span class="cmd">cat education.txt</span></p>
+          <p class="out">Jadavpur University - Engineering Student (2026)</p>
+          
+          <p><span class="prompt">root@kali:~#</span> <span class="cmd">grep "focus" config.json</span></p>
+          <p class="out">"primary": <span class="string">"Software Development"</span>,<br/>"secondary": <span class="string">"Ethical Hacking & SecOps"</span></p>
+          
+          <p><span class="prompt">root@kali:~#</span> <span class="cmd">./status.sh</span></p>
+          <p class="out" style="color: var(--accent)">[+] Open to Internships & Projects</p>
+          <p class="prompt blink">_</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PORTFOLIO -->
   <section id="portfolio">
-    <div class="section-label reveal">Selected Work</div>
+    <div class="section-label reveal">Deployed Assets</div>
     <h2 class="section-title reveal">Projects</h2>
+    
     <div class="projects-grid">
-
+      
       <div class="project-card reveal">
-        <a class="project-link" href="#">↗</a>
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">01</div>
-        <div class="project-tag">Security</div>
+        <div class="project-tag">Security Tool</div>
         <div class="project-name">NetScanner</div>
         <p class="project-desc">A Python-based network scanner that detects open ports, running services, and potential vulnerabilities on a target system.</p>
         <div class="project-stack">
@@ -465,72 +525,73 @@
         </div>
       </div>
 
-      <div class="project-card reveal reveal-delay-1">
-        <a class="project-link" href="#">↗</a>
+      <div class="project-card reveal delay-1">
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">02</div>
         <div class="project-tag">C++ / DSA</div>
         <div class="project-name">AlgoVault</div>
-        <p class="project-desc">A collection of classic data structures and algorithms implemented in C++ — sorting, graphs, trees, and dynamic programming.</p>
+        <p class="project-desc">A comprehensive collection of classic data structures and algorithms implemented in C++ covering sorting, graphs, and dynamic programming.</p>
         <div class="project-stack">
-          <span>C++</span><span>STL</span><span>OOP</span>
+          <span>C++</span><span>STL</span><span>Algorithms</span>
         </div>
       </div>
 
-      <div class="project-card reveal reveal-delay-2">
-        <a class="project-link" href="#">↗</a>
+      <div class="project-card reveal delay-2">
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">03</div>
-        <div class="project-tag">Python Tool</div>
+        <div class="project-tag">Cryptography</div>
         <div class="project-name">PassForge</div>
         <p class="project-desc">A secure password generator and strength analyzer built in Python. Generates cryptographically strong passwords with entropy scoring.</p>
         <div class="project-stack">
-          <span>Python</span><span>Cryptography</span><span>CLI</span>
+          <span>Python</span><span>Crypto</span><span>CLI</span>
         </div>
       </div>
 
       <div class="project-card reveal">
-        <a class="project-link" href="#">↗</a>
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">04</div>
         <div class="project-tag">Java App</div>
         <div class="project-name">TaskFlow</div>
-        <p class="project-desc">A Java desktop task manager with a clean GUI. Features priority queues, deadlines, and persistent storage using file I/O.</p>
+        <p class="project-desc">A robust Java desktop task manager. Features priority queues, deadlines, and persistent local storage utilizing file I/O operations.</p>
         <div class="project-stack">
           <span>Java</span><span>Swing</span><span>File I/O</span>
         </div>
       </div>
 
-      <div class="project-card reveal reveal-delay-1">
-        <a class="project-link" href="#">↗</a>
+      <div class="project-card reveal delay-1">
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">05</div>
-        <div class="project-tag">C / Systems</div>
+        <div class="project-tag">C / OS Systems</div>
         <div class="project-name">MiniShell</div>
-        <p class="project-desc">A custom Unix shell built in C that supports piping, redirection, background processes, and basic built-in commands.</p>
+        <p class="project-desc">A custom Unix shell built entirely in C that supports advanced piping, redirection, background processes, and system calls.</p>
         <div class="project-stack">
-          <span>C</span><span>Linux</span><span>System Calls</span>
+          <span>C</span><span>Linux</span><span>Syscalls</span>
         </div>
       </div>
 
-      <div class="project-card reveal reveal-delay-2">
-        <a class="project-link" href="#">↗</a>
+      <div class="project-card reveal delay-2">
+        <a class="project-link hover-target" href="#">↗</a>
         <div class="project-num">06</div>
-        <div class="project-tag">CTF / Security</div>
-        <div class="project-name">CTF Writeups</div>
-        <p class="project-desc">Collection of Capture The Flag challenge writeups covering web exploitation, reverse engineering, and cryptography puzzles.</p>
+        <div class="project-tag">CTF Writeups</div>
+        <div class="project-name">SecNotes</div>
+        <p class="project-desc">A detailed documentation repo of Capture The Flag (CTF) challenges covering web exploitation, reverse engineering, and privilege escalation.</p>
         <div class="project-stack">
-          <span>Python</span><span>Bash</span><span>Linux</span><span>Kali</span>
+          <span>Markdown</span><span>Bash</span><span>Kali</span>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- SKILLS -->
   <section id="skills">
-    <div class="section-label reveal">Expertise</div>
-    <h2 class="section-title reveal">Skills</h2>
+    <div class="section-label reveal">Technical Arsenal</div>
+    <h2 class="section-title reveal">Expertise</h2>
     <div class="skills-layout">
+      
       <div>
         <div class="skill-group reveal">
-          <div class="skill-group-name">// Programming Languages</div>
+          <div class="skill-group-name">01 // Languages</div>
+          
           <div class="skill-item">
             <span class="skill-name">C++</span>
             <div class="skill-bar"><div class="skill-bar-fill" data-pct="88"></div></div>
@@ -543,142 +604,193 @@
           </div>
           <div class="skill-item">
             <span class="skill-name">C</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="83"></div></div>
-            <span class="skill-pct">83%</span>
+            <div class="skill-bar"><div class="skill-bar-fill" data-pct="80"></div></div>
+            <span class="skill-pct">80%</span>
           </div>
           <div class="skill-item">
             <span class="skill-name">Java</span>
+            <div class="skill-bar"><div class="skill-bar-fill" data-pct="75"></div></div>
+            <span class="skill-pct">75%</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal delay-1">
+          <div class="skill-group-name">02 // Security & DefSec</div>
+          <div class="skill-item">
+            <span class="skill-name">Ethical Hacking</span>
+            <div class="skill-bar"><div class="skill-bar-fill" data-pct="82"></div></div>
+            <span class="skill-pct">82%</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Network Security</span>
             <div class="skill-bar"><div class="skill-bar-fill" data-pct="78"></div></div>
             <span class="skill-pct">78%</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Penetration Testing</span>
+            <div class="skill-bar"><div class="skill-bar-fill" data-pct="70"></div></div>
+            <span class="skill-pct">70%</span>
           </div>
         </div>
       </div>
 
       <div>
-        <div class="skill-group reveal">
-          <div class="skill-group-name">// Cybersecurity</div>
-          <div class="skill-item">
-            <span class="skill-name">Ethical Hacking</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="80"></div></div>
-            <span class="skill-pct">80%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Network Security</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="75"></div></div>
-            <span class="skill-pct">75%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Penetration Testing</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="72"></div></div>
-            <span class="skill-pct">72%</span>
+        <div class="skill-group reveal delay-2">
+          <div class="skill-group-name">03 // Tools & Environment</div>
+          <div class="tools-cloud">
+            <div class="tool-badge hover-target">Linux Arch/Debian</div>
+            <div class="tool-badge hover-target">Kali Linux</div>
+            <div class="tool-badge hover-target">Git & GitHub</div>
+            <div class="tool-badge hover-target">Nmap</div>
+            <div class="tool-badge hover-target">Wireshark</div>
+            <div class="tool-badge hover-target">Metasploit Framework</div>
+            <div class="tool-badge hover-target">Bash Scripting</div>
+            <div class="tool-badge hover-target">Burp Suite</div>
+            <div class="tool-badge hover-target">VS Code</div>
+            <div class="tool-badge hover-target">GDB Debugger</div>
           </div>
         </div>
-
-        <div class="skill-group reveal">
-          <div class="skill-group-name">// Tools & Environment</div>
+        
+        <div class="skill-group reveal delay-2">
+          <div class="skill-group-name">04 // Core Concepts</div>
           <div class="tools-cloud">
-            <div class="tool-badge">Linux</div>
-            <div class="tool-badge">Kali Linux</div>
-            <div class="tool-badge">Git</div>
-            <div class="tool-badge">Nmap</div>
-            <div class="tool-badge">Wireshark</div>
-            <div class="tool-badge">Metasploit</div>
-            <div class="tool-badge">Bash</div>
-            <div class="tool-badge">VS Code</div>
-            <div class="tool-badge">OOP</div>
-            <div class="tool-badge">DSA</div>
-            <div class="tool-badge">GDB</div>
-            <div class="tool-badge">CTF</div>
+            <div class="tool-badge">Data Structures</div>
+            <div class="tool-badge">Algorithms</div>
+            <div class="tool-badge">Object Oriented Programming</div>
+            <div class="tool-badge">Operating Systems</div>
+            <div class="tool-badge">Computer Networks</div>
           </div>
         </div>
       </div>
+      
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact">
     <div class="reveal">
-      <div class="section-label">Get In Touch</div>
+      <div class="section-label">Establish Connection</div>
       <div class="contact-big">Let's<br/>Connect,<br/><span class="accent">Sumit.</span></div>
-      <p class="contact-email">Drop me a line at<br/><a href="mailto:sumitdas@email.com">sumitdas@email.com</a></p>
+      
+      <p class="contact-email">Ping me directly at<br/>
+        <a href="mailto:sumitdas712424@gmail.com" class="hover-target">sumitdas712424@gmail.com</a>
+      </p>
+      
       <div class="social-links">
-        <a class="social-link" href="https://github.com/S-s-3440" target="_blank">GitHub</a>
-        <a class="social-link" href="#">LinkedIn</a>
-        <a class="social-link" href="#">Twitter</a>
+        <a class="social-link hover-target" href="https://github.com/S-s-3440" target="_blank">GitHub</a>
+        <a class="social-link hover-target" href="#">LinkedIn</a>
+        <a class="social-link hover-target" href="#">Twitter/X</a>
       </div>
     </div>
 
-    <div class="contact-form reveal reveal-delay-2">
+    <form class="contact-form reveal delay-1" id="contactForm">
       <div class="form-group">
-        <label>Name</label>
-        <input type="text" placeholder="Your name" />
+        <label>Your Name // ID</label>
+        <input type="text" placeholder="John Doe" required />
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" placeholder="your@email.com" />
+        <label>Return Address // Email</label>
+        <input type="email" placeholder="john@domain.com" required />
       </div>
       <div class="form-group">
-        <label>Message</label>
-        <textarea placeholder="Tell me about your project or opportunity..."></textarea>
+        <label>Transmission // Message</label>
+        <textarea placeholder="Discussing a potential breach... I mean, project opportunity." required></textarea>
       </div>
-      <button class="btn-submit">Send Message →</button>
-    </div>
+      <button type="submit" class="btn-submit hover-target">Execute Send.sh</button>
+    </form>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-left">© 2026 Sumit Das — Jadavpur University</div>
-    <div class="footer-right">Built with code & curiosity.</div>
+    <div class="footer-right">Secured & Built with pure code.</div>
   </footer>
 
   <script>
-    // Custom cursor
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    // --- 1. Custom Cursor Logic ---
+    const cursor = document.getElementById('cursor');       // The tiny dot
+    const ring = document.getElementById('cursorRing');     // The trailing circle
+    const hoverTargets = document.querySelectorAll('.hover-target, a, button'); // Elements that make cursor expand
+    
+    let mouseX = 0, mouseY = 0; // Where the mouse actually is
+    let ringX = 0, ringY = 0;   // Where the trailing ring currently is
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+    // Update mouse coordinates whenever the mouse moves
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      // Immediately move the tiny dot to exact mouse coordinates
+      cursor.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
     });
 
+    // Smooth animation loop for the trailing ring
     function animateRing() {
-      rx += (mx - rx - 18) * 0.12;
-      ry += (my - ry - 18) * 0.12;
-      ring.style.transform = `translate(${rx}px, ${ry}px)`;
-      requestAnimationFrame(animateRing);
+      // Linear interpolation (lerp) - moves the ring 15% of the distance to the mouse every frame
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      
+      // Apply the position
+      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+      requestAnimationFrame(animateRing); // Call this function again on the next frame
     }
-    animateRing();
+    animateRing(); // Start the loop
 
-    document.querySelectorAll('a, button, .project-card, .tool-badge').forEach(el => {
-      el.addEventListener('mouseenter', () => { ring.style.opacity = '1'; });
-      el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
+    // Add expansion class to ring when hovering over specific targets
+    hoverTargets.forEach(target => {
+      target.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      target.addEventListener('mouseleave', () => ring.classList.remove('hover'));
     });
 
-    // Scroll reveal
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          e.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
-            bar.style.width = bar.dataset.pct + '%';
+
+    // --- 2. Scroll Animations (Intersection Observer) ---
+    // This tells the browser to trigger when 15% (0.15) of an element comes into view
+    const observerOptions = {
+      threshold: 0.15,
+      rootMargin: "0px 0px -50px 0px" // Triggers slightly before the element fully hits the bottom of the screen
+    };
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // If the element has scrolled into view...
+        if (entry.isIntersecting) {
+          
+          // 1. Add 'visible' class to trigger the CSS fade-in animation
+          entry.target.classList.add('visible');
+          
+          // 2. If this section contains skill bars, animate their widths now
+          const skillBars = entry.target.querySelectorAll('.skill-bar-fill');
+          skillBars.forEach(bar => {
+            // Take the percentage stored in 'data-pct' in the HTML, and apply it to CSS width
+            bar.style.width = bar.getAttribute('data-pct') + '%';
           });
+          
+          // Stop observing this element so the animation only happens once
+          scrollObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, observerOptions);
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    // Find all HTML elements with the class 'reveal' and watch them with our observer
+    document.querySelectorAll('.reveal').forEach(el => scrollObserver.observe(el));
 
-    // Skill bars on section entry
-    const skillsSection = document.getElementById('skills');
-    const skillObserver = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        document.querySelectorAll('.skill-bar-fill').forEach(bar => {
-          bar.style.width = bar.dataset.pct + '%';
-        });
-      }
-    }, { threshold: 0.2 });
-    skillObserver.observe(skillsSection);
+
+    // --- 3. Contact Form Submission Simulation ---
+    // Right now, the form doesn't send data to a server. This stops the page from reloading.
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault(); // Stop default browser refresh
+      
+      // Provide visual feedback that the button was clicked
+      const btn = e.target.querySelector('button');
+      btn.innerText = "Transmitted ✓";
+      btn.style.background = "#27c93f"; // Change button to green
+      btn.style.color = "#fff";
+      
+      // Reset the button and clear the form after 3 seconds
+      setTimeout(() => {
+        btn.innerText = "Execute Send.sh";
+        btn.style.background = "var(--accent)";
+        btn.style.color = "#000";
+        e.target.reset(); // Clears all input fields
+      }, 3000);
+    });
   </script>
 </body>
 </html>
