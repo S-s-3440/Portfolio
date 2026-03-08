@@ -1,796 +1,202 @@
  <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sumit Das — Cybersecurity & Dev Portfolio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUMIT_DAS // SEC_ARCHITECT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
     /* =========================================
-       1. GLOBAL VARIABLES (THEME SETTINGS)
-       Change these colors to update the whole site's theme!
+       1. THE "OS" ENVIRONMENT
        ========================================= */
     :root {
-      --bg: #05080c;           /* Main background color (very dark blue/black) */
-      --surface: #0a0e14;      /* Slightly lighter background for cards/sections */
-      --border: #16202c;       /* Border color for separating elements */
-      --accent: #00ffa3;       /* Main hacker green color */
-      --accent-hover: #00cc82; /* Slightly darker green for hover effects */
-      --muted: #2d3b4d;        /* Dark grey for subtle elements */
-      --text: #cdd8e3;         /* Main text color (light grey) */
-      --text-dim: #6b8299;     /* Dimmed text color for secondary info */
-      --glow: 0 0 20px rgba(0, 255, 163, 0.2); /* Neon glow effect for buttons/cards */
+      --glow-color: #00f2ff;
+      --bg-color: #020406;
+      --panel-color: rgba(10, 15, 20, 0.9);
+      --text-color: #c0d1d1;
+      --border-color: rgba(0, 242, 255, 0.3);
     }
 
-    /* Reset default margins and padding for all elements */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
     
-    /* Makes anchor links smoothly scroll to their sections */
-    html { scroll-behavior: smooth; }
-
-    /* =========================================
-       2. BASE BODY STYLES & BACKGROUND
-       ========================================= */
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Mono', monospace; /* Default font for the whole site */
-      font-size: 15px;
-      line-height: 1.7;
-      overflow-x: hidden; /* Prevents horizontal scrolling */
-      cursor: none; /* Hides the default mouse cursor so we can use our custom one */
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Share Tech Mono', monospace;
+      overflow-x: hidden;
+      /* CRT flicker effect */
+      animation: flicker 0.15s infinite alternate;
     }
 
-    /* The tiny green dot that follows your mouse immediately */
-    .cursor {
-      width: 8px; height: 8px;
-      background: var(--accent); border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%, -50%); /* Centers the dot on the cursor coordinates */
-    }
-
-    /* The outer ring that smoothly trails the dot */
-    .cursor-ring {
-      width: 40px; height: 40px;
-      border: 1px solid var(--accent); border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s, height 0.3s, background 0.3s; /* Smooth animation when it changes size */
-    }
-
-    /* The class added by JavaScript when hovering over a clickable item */
-    .cursor-ring.hover {
-      width: 60px; height: 60px;
-      background: rgba(0, 255, 163, 0.1);
-      border-color: transparent;
-    }
-
-    /* Cyberpunk static noise background effect */
+    /* Scanline Overlay Effect */
     body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; 
-    }
-
-    /* Subtle grid lines background effect */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,163,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,163,0.015) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
-    }
-
-    /* =========================================
-       3. NAVIGATION BAR
-       ========================================= */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 20px 60px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(22, 32, 44, 0.8);
-      background: rgba(5, 8, 12, 0.8);
-      backdrop-filter: blur(12px); /* Creates the frosted glass effect */
-    }
-    
-    .nav-logo {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
-      color: var(--accent); text-decoration: none; letter-spacing: -0.5px;
-      position: relative;
-    }
-    .nav-logo span { color: var(--text-dim); }
-    
-    /* Glitch Animation for the Logo on hover */
-    .nav-logo:hover { animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; }
-    @keyframes glitch {
-      0% { transform: translate(0) }
-      20% { transform: translate(-2px, 2px) }
-      40% { transform: translate(-2px, -2px) }
-      60% { transform: translate(2px, 2px) }
-      80% { transform: translate(2px, -2px) }
-      100% { transform: translate(0) }
-    }
-
-    /* Nav Links styling */
-    .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a {
-      color: var(--text-dim); text-decoration: none;
-      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
-      transition: color 0.3s; position: relative;
-    }
-    /* The animated underline on nav links */
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: -6px; left: 0; right: 0; height: 2px;
-      background: var(--accent); transform: scaleX(0); transform-origin: right;
-      transition: transform 0.3s ease;
-    }
-    .nav-links a:hover { color: var(--accent); }
-    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
-
-    /* =========================================
-       4. HERO SECTION (Top of the page)
-       ========================================= */
-    #hero {
-      min-height: 100vh; /* Takes up the full height of the screen */
-      display: flex; align-items: center;
-      padding: 120px 60px 60px;
-      position: relative; overflow: hidden;
-    }
-    
-    /* The large soft green gradient circle behind the text */
-    .hero-glow {
-      position: absolute; width: 50vw; height: 50vw;
-      background: radial-gradient(circle, rgba(0,255,163,0.05) 0%, transparent 60%);
-      top: 50%; left: 30%; transform: translate(-50%, -50%);
+      content: " ";
+      position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 1000;
+      background-size: 100% 4px, 3px 100%;
       pointer-events: none;
     }
-    
-    .hero-content { position: relative; z-index: 1; max-width: 900px; }
-    
-    .hero-label {
-      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 24px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .hero-label::before {
-      content: ''; display: inline-block; width: 40px; height: 1px; background: var(--accent);
-    }
-    
-    .hero-title {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(48px, 8vw, 100px); /* Scales automatically based on screen width */
-      font-weight: 800; line-height: 1;
-      letter-spacing: -2px; color: #fff; margin-bottom: 32px;
-    }
-    
-    /* Strikethrough text effect for 'Breaker.' */
-    .hero-title .dim { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--accent); }
-    
-    .hero-desc {
-      max-width: 500px; color: var(--text-dim); font-size: 15px; line-height: 1.8;
-      margin-bottom: 48px;
-    }
-    .hero-desc strong { color: #fff; font-weight: 400; }
-    
-    /* Call to Action Buttons */
-    .hero-cta { display: flex; gap: 24px; align-items: center; }
-    
-    .btn-primary {
-      background: transparent; color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 14px 32px; text-decoration: none;
-      font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
-      transition: all 0.3s; position: relative; overflow: hidden;
-    }
-    /* Button background slide animation */
-    .btn-primary::before {
-      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-      background: var(--accent); transition: all 0.3s; z-index: -1;
-    }
-    .btn-primary:hover { color: #000; box-shadow: var(--glow); }
-    .btn-primary:hover::before { left: 0; }
-    
-    .btn-ghost {
-      color: var(--text-dim); text-decoration: none;
-      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
-      border-bottom: 1px solid transparent; padding-bottom: 2px;
-      transition: all 0.3s;
-    }
-    .btn-ghost:hover { color: #fff; border-color: var(--accent); }
 
     /* =========================================
-       5. GENERAL SECTION STYLING (Used across About, Portfolio, etc.)
+       2. LAYOUT (BENTO BOX V3)
        ========================================= */
-    section { padding: 120px 60px; position: relative; z-index: 1; }
-    
-    .section-label {
-      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .section-label::before {
-      content: ''; display: inline-block; width: 40px; height: 1px; background: var(--accent);
-    }
-    
-    .section-title {
-      font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: clamp(32px, 5vw, 56px);
-      letter-spacing: -1.5px; color: #fff; line-height: 1; margin-bottom: 60px;
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 15px;
+      padding: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
+    .panel {
+      background: var(--panel-color);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+    }
+
+    /* Glowing corners for panels */
+    .panel::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 10px; height: 10px;
+      border-top: 2px solid var(--glow-color); border-left: 2px solid var(--glow-color);
+    }
+
+    /* Section Specifics */
+    .hero-panel { grid-column: span 8; height: 300px; display: flex; flex-direction: column; justify-content: center; }
+    .status-panel { grid-column: span 4; }
+    .project-panel { grid-column: span 4; min-height: 200px; transition: 0.3s; }
+    .project-panel:hover { background: rgba(0, 242, 255, 0.05); border-color: var(--glow-color); }
+    
     /* =========================================
-       6. ABOUT SECTION & TERMINAL WINDOW
+       3. TYPOGRAPHY & ANIMATIONS
        ========================================= */
-    #about {
-      border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; color: #fff; text-shadow: 0 0 10px var(--glow-color); margin-bottom: 10px; }
+    .status-line { font-size: 12px; margin-bottom: 5px; color: var(--glow-color); }
+    .decrypt-text { color: var(--glow-color); }
+
+    /* Keyframe for CRT Flicker */
+    @keyframes flicker {
+      0% { opacity: 0.98; }
+      100% { opacity: 1; }
     }
-    .about-text p { color: var(--text-dim); font-size: 15px; line-height: 1.9; margin-bottom: 20px; }
-    .about-text p strong { color: var(--accent); font-weight: 400; }
-    
-    /* Terminal Card UI Styling */
-    .terminal-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+    /* Floating Nav */
+    nav {
+      position: fixed; top: 20px; right: 30px; z-index: 1100;
+      display: flex; gap: 20px;
     }
-    .terminal-header {
-      background: #1a2330; padding: 10px 16px; display: flex; align-items: center; gap: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    /* Mac-style window dots */
-    .terminal-header .dot { width: 12px; height: 12px; border-radius: 50%; }
-    .dot.red { background: #ff5f56; }
-    .dot.yellow { background: #ffbd2e; }
-    .dot.green { background: #27c93f; }
-    .terminal-header .title { margin-left: auto; margin-right: auto; font-size: 12px; color: var(--text-dim); }
-    
-    /* Terminal Code Text Styling */
-    .terminal-body { padding: 24px; font-size: 14px; line-height: 1.6; }
-    .terminal-body .prompt { color: var(--accent); margin-right: 8px; }
-    .terminal-body .cmd { color: #fff; }
-    .terminal-body .out { color: var(--text-dim); margin-bottom: 16px; margin-left: 20px;}
-    .terminal-body .string { color: #f1fa8c; }
+    nav a { color: var(--glow-color); text-decoration: none; border: 1px solid var(--glow-color); padding: 5px 15px; font-size: 12px; }
+    nav a:hover { background: var(--glow-color); color: #000; }
 
     /* =========================================
-       7. PORTFOLIO / PROJECTS GRID
+       4. THE TERMINAL
        ========================================= */
-    #portfolio { border-top: 1px solid var(--border); }
-    
-    /* CSS Grid automatically wraps cards to new rows when space runs out */
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-    
-    .project-card {
-      background: var(--surface); padding: 40px 32px;
-      border: 1px solid var(--border);
-      position: relative; overflow: hidden;
-      transition: all 0.4s ease; /* Smooth hover transition */
-    }
-    
-    /* The animated green line that appears at the top of a card on hover */
-    .project-card::before {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-      background: var(--accent); transform: scaleX(0); transform-origin: left;
-      transition: transform 0.4s ease;
-    }
-    .project-card:hover { transform: translateY(-8px); border-color: #2a3847; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-    .project-card:hover::before { transform: scaleX(1); }
-    
-    .project-num {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 40px;
-      color: var(--border); line-height: 1; margin-bottom: 24px; transition: color 0.4s;
-    }
-    .project-card:hover .project-num { color: rgba(0,255,163,0.2); }
-    
-    .project-tag {
-      display: inline-block; padding: 4px 12px;
-      background: rgba(0,255,163,0.05); border: 1px solid rgba(0,255,163,0.2);
-      color: var(--accent); font-size: 10px; letter-spacing: 0.15em;
-      text-transform: uppercase; margin-bottom: 16px;
-    }
-    
-    .project-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 24px; color: #fff; margin-bottom: 12px; }
-    .project-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
-    
-    .project-stack { display: flex; gap: 8px; flex-wrap: wrap; }
-    .project-stack span {
-      font-size: 11px; color: var(--text-dim);
-      background: var(--bg); padding: 4px 10px; border-radius: 4px;
-    }
-    
-    /* The arrow icon button inside project cards */
-    .project-link {
-      position: absolute; top: 32px; right: 32px;
-      width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-dim); text-decoration: none; font-size: 16px; transition: all 0.3s;
-    }
-    .project-card:hover .project-link { background: var(--accent); color: #000; border-color: var(--accent); transform: rotate(45deg); }
+    .terminal { grid-column: span 12; background: #000; height: 150px; font-size: 13px; padding: 15px; color: #00ff41; border: 1px solid #004411; }
 
-    /* =========================================
-       8. SKILLS SECTION
-       ========================================= */
-    #skills { border-top: 1px solid var(--border); }
-    .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
-    .skill-group { margin-bottom: 48px; }
-    .skill-group-name {
-      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--text); margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 8px;
-    }
-    .skill-item { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .skill-name { font-size: 14px; color: var(--text-dim); min-width: 140px; }
-    
-    /* The background of the progress bar */
-    .skill-bar { flex: 1; height: 4px; background: var(--surface); position: relative; border-radius: 2px; overflow: hidden; }
-    
-    /* The green fill of the progress bar (Width is set via JavaScript) */
-    .skill-bar-fill {
-      position: absolute; left: 0; top: 0; bottom: 0;
-      background: var(--accent); box-shadow: var(--glow);
-      width: 0%; transition: width 1.5s cubic-bezier(.22,1,.36,1);
-    }
-    
-    .skill-pct { font-size: 12px; color: var(--accent); min-width: 36px; text-align: right; }
-    
-    /* Cloud of tool badges */
-    .tools-cloud { display: flex; flex-wrap: wrap; gap: 12px; }
-    .tool-badge {
-      padding: 8px 16px; background: var(--surface); border: 1px solid var(--border);
-      color: var(--text-dim); font-size: 13px; transition: all 0.3s;
-    }
-    .tool-badge:hover { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
-
-    /* =========================================
-       9. CONTACT SECTION & FORM
-       ========================================= */
-    #contact {
-      border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
-    }
-    .contact-big {
-      font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: clamp(40px, 6vw, 72px);
-      letter-spacing: -2px; color: #fff; line-height: 1; margin-bottom: 24px;
-    }
-    .contact-big .accent { color: var(--accent); }
-    
-    .contact-email { font-size: 16px; color: var(--text-dim); margin-bottom: 40px; }
-    .contact-email a {
-      color: var(--accent); text-decoration: none;
-      border-bottom: 1px dashed var(--accent); padding-bottom: 2px; transition: opacity 0.3s;
-    }
-    .contact-email a:hover { opacity: 0.7; }
-    
-    .social-links { display: flex; gap: 16px; }
-    .social-link {
-      padding: 12px 24px; border: 1px solid var(--border);
-      color: var(--text); text-decoration: none; font-size: 12px;
-      letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.3s;
-    }
-    .social-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,163,0.05); }
-    
-    /* Contact Form Styling */
-    .contact-form { display: flex; flex-direction: column; gap: 24px; background: var(--surface); padding: 40px; border: 1px solid var(--border); }
-    .form-group { display: flex; flex-direction: column; gap: 8px; }
-    .form-group label { font-size: 12px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
-    
-    .form-group input, .form-group textarea {
-      background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px;
-      padding: 16px; outline: none; transition: border-color 0.3s; resize: none; /* resize: none stops user from dragging text box corners */
-    }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
-    .form-group textarea { height: 140px; }
-    
-    .btn-submit {
-      background: var(--accent); color: #000; border: none;
-      font-family: 'Syne', sans-serif; font-weight: 700;
-      font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 16px; transition: all 0.3s; cursor: none; margin-top: 8px;
-    }
-    .btn-submit:hover { background: var(--accent-hover); box-shadow: var(--glow); }
-
-    /* =========================================
-       10. FOOTER
-       ========================================= */
-    footer {
-      border-top: 1px solid var(--border); padding: 40px 60px;
-      display: flex; justify-content: space-between; align-items: center;
-      position: relative; z-index: 1; background: var(--surface);
-    }
-    .footer-left { font-size: 13px; color: var(--text-dim); }
-    .footer-right { font-size: 13px; color: var(--muted); }
-
-    /* =========================================
-       11. SCROLL REVEAL ANIMATION CLASSES
-       Used in conjunction with the Javascript Intersection Observer
-       ========================================= */
-    /* Hidden state */
-    .reveal {
-      opacity: 0; transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
-    }
-    /* Visible state (JS adds this class) */
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    /* Delay classes to create staggered fade-ins */
-    .delay-1 { transition-delay: 0.1s; }
-    .delay-2 { transition-delay: 0.2s; }
-
-    /* =========================================
-       12. MOBILE RESPONSIVE QUERIES
-       Adjusts layout when screen width is 900px or less
-       ========================================= */
     @media (max-width: 900px) {
-      nav { padding: 20px 24px; }
-      section { padding: 80px 24px; }
-      #hero { padding: 140px 24px 80px; }
-      /* Changes grid layouts to stack vertically on mobile */
-      #about, #contact, .skills-layout { grid-template-columns: 1fr; gap: 48px; }
-      .contact-form { padding: 24px; }
-      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
-      
-      /* Disable custom cursor on mobile touch screens */
-      .cursor, .cursor-ring { display: none; } 
-      body { cursor: auto; }
-      .btn-submit { cursor: pointer; }
+      .hero-panel, .status-panel, .project-panel { grid-column: span 12; }
     }
   </style>
 </head>
 <body>
 
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
-
   <nav>
-    <a class="nav-logo" href="#hero">SUMIT<span>.dev</span></a>
-    <ul class="nav-links">
-      <li><a href="#about" class="hover-target">About</a></li>
-      <li><a href="#portfolio" class="hover-target">Work</a></li>
-      <li><a href="#skills" class="hover-target">Skills</a></li>
-      <li><a href="#contact" class="hover-target">Contact</a></li>
-    </ul>
+    <a href="#projects">FILES</a>
+    <a href="mailto:sumitdas712424@gmail.com">CONTACT</a>
   </nav>
 
-  <section id="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="hero-label reveal">Jadavpur University · Class of 2026</div>
-      <h1 class="hero-title reveal delay-1">
-        Coder.<br/>
-        Hacker.<br/>
-        <span class="dim">Breaker.</span> Builder.
-      </h1>
-      <p class="hero-desc reveal delay-2">
-        I'm <strong>Sumit Das</strong>, an engineering student passionate about systems, programming, and cybersecurity. I build robust applications and explore the intricacies of ethical hacking.
-      </p>
-      <div class="hero-cta reveal delay-2">
-        <a href="#portfolio" class="btn-primary hover-target">Deploy Projects</a>
-        <a href="#contact" class="btn-ghost hover-target">Initiate Contact →</a>
-      </div>
+  <div class="dashboard">
+    <div class="panel hero-panel">
+      <div class="status-line">[ SUBJECT: SUMIT_DAS_JU_2026 ]</div>
+      <h1 id="brute-name">SUMIT DAS</h1>
+      <p style="opacity: 0.7;">> CYBERSECURITY ARCHITECT & DEV</p>
+      <p style="font-size: 12px; margin-top: 15px;">LOCATION: JADAVPUR_UNIVERSITY_KOLKATA</p>
     </div>
-  </section>
 
-  <section id="about">
-    <div class="about-text reveal">
-      <div class="section-label">System.info</div>
-      <h2 class="section-title">Who I Am</h2>
-      <p>I am an engineering student at <strong>Jadavpur University</strong> with a deep passion for writing clean code and discovering system vulnerabilities.</p>
-      <p>My toolkit primarily revolves around <strong>C++, Python, C and Java</strong>. Whether it's crafting an efficient algorithm, building full-stack applications, or scripting network tools, I love seeing lines of code turn into reality.</p>
-      <p>Beyond traditional development, I am heavily invested in <strong>ethical hacking</strong>. I analyze network security, compete in CTFs, and continuously train to think like an attacker to build safer digital environments.</p>
-    </div>
-    
-    <div class="about-visual reveal delay-1">
-      <div class="terminal-card">
-        <div class="terminal-header">
-          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
-          <div class="title">sumit@kali:~</div>
-        </div>
-        <div class="terminal-body">
-          <p><span class="prompt">root@kali:~#</span> <span class="cmd">whoami</span></p>
-          <p class="out">Sumit Das</p>
-          
-          <p><span class="prompt">root@kali:~#</span> <span class="cmd">cat education.txt</span></p>
-          <p class="out">Jadavpur University - Engineering Student (2026)</p>
-          
-          <p><span class="prompt">root@kali:~#</span> <span class="cmd">grep "focus" config.json</span></p>
-          <p class="out">"primary": <span class="string">"Software Development"</span>,<br/>"secondary": <span class="string">"Ethical Hacking & SecOps"</span></p>
-          
-          <p><span class="prompt">root@kali:~#</span> <span class="cmd">./status.sh</span></p>
-          <p class="out" style="color: var(--accent)">[+] Open to Internships & Projects</p>
-          <p class="prompt blink">_</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="portfolio">
-    <div class="section-label reveal">Deployed Assets</div>
-    <h2 class="section-title reveal">Projects</h2>
-    
-    <div class="projects-grid">
-      
-      <div class="project-card reveal">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">01</div>
-        <div class="project-tag">Security Tool</div>
-        <div class="project-name">NetScanner</div>
-        <p class="project-desc">A Python-based network scanner that detects open ports, running services, and potential vulnerabilities on a target system.</p>
-        <div class="project-stack">
-          <span>Python</span><span>Sockets</span><span>Nmap</span>
-        </div>
-      </div>
-
-      <div class="project-card reveal delay-1">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">02</div>
-        <div class="project-tag">C++ / DSA</div>
-        <div class="project-name">AlgoVault</div>
-        <p class="project-desc">A comprehensive collection of classic data structures and algorithms implemented in C++ covering sorting, graphs, and dynamic programming.</p>
-        <div class="project-stack">
-          <span>C++</span><span>STL</span><span>Algorithms</span>
-        </div>
-      </div>
-
-      <div class="project-card reveal delay-2">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">03</div>
-        <div class="project-tag">Cryptography</div>
-        <div class="project-name">PassForge</div>
-        <p class="project-desc">A secure password generator and strength analyzer built in Python. Generates cryptographically strong passwords with entropy scoring.</p>
-        <div class="project-stack">
-          <span>Python</span><span>Crypto</span><span>CLI</span>
-        </div>
-      </div>
-
-      <div class="project-card reveal">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">04</div>
-        <div class="project-tag">Java App</div>
-        <div class="project-name">TaskFlow</div>
-        <p class="project-desc">A robust Java desktop task manager. Features priority queues, deadlines, and persistent local storage utilizing file I/O operations.</p>
-        <div class="project-stack">
-          <span>Java</span><span>Swing</span><span>File I/O</span>
-        </div>
-      </div>
-
-      <div class="project-card reveal delay-1">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">05</div>
-        <div class="project-tag">C / OS Systems</div>
-        <div class="project-name">MiniShell</div>
-        <p class="project-desc">A custom Unix shell built entirely in C that supports advanced piping, redirection, background processes, and system calls.</p>
-        <div class="project-stack">
-          <span>C</span><span>Linux</span><span>Syscalls</span>
-        </div>
-      </div>
-
-      <div class="project-card reveal delay-2">
-        <a class="project-link hover-target" href="#">↗</a>
-        <div class="project-num">06</div>
-        <div class="project-tag">CTF Writeups</div>
-        <div class="project-name">SecNotes</div>
-        <p class="project-desc">A detailed documentation repo of Capture The Flag (CTF) challenges covering web exploitation, reverse engineering, and privilege escalation.</p>
-        <div class="project-stack">
-          <span>Markdown</span><span>Bash</span><span>Kali</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <section id="skills">
-    <div class="section-label reveal">Technical Arsenal</div>
-    <h2 class="section-title reveal">Expertise</h2>
-    <div class="skills-layout">
-      
-      <div>
-        <div class="skill-group reveal">
-          <div class="skill-group-name">01 // Languages</div>
-          
-          <div class="skill-item">
-            <span class="skill-name">C++</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="88"></div></div>
-            <span class="skill-pct">88%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Python</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="85"></div></div>
-            <span class="skill-pct">85%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">C</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="80"></div></div>
-            <span class="skill-pct">80%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Java</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="75"></div></div>
-            <span class="skill-pct">75%</span>
-          </div>
-        </div>
-
-        <div class="skill-group reveal delay-1">
-          <div class="skill-group-name">02 // Security & DefSec</div>
-          <div class="skill-item">
-            <span class="skill-name">Ethical Hacking</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="82"></div></div>
-            <span class="skill-pct">82%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Network Security</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="78"></div></div>
-            <span class="skill-pct">78%</span>
-          </div>
-          <div class="skill-item">
-            <span class="skill-name">Penetration Testing</span>
-            <div class="skill-bar"><div class="skill-bar-fill" data-pct="70"></div></div>
-            <span class="skill-pct">70%</span>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="skill-group reveal delay-2">
-          <div class="skill-group-name">03 // Tools & Environment</div>
-          <div class="tools-cloud">
-            <div class="tool-badge hover-target">Linux Arch/Debian</div>
-            <div class="tool-badge hover-target">Kali Linux</div>
-            <div class="tool-badge hover-target">Git & GitHub</div>
-            <div class="tool-badge hover-target">Nmap</div>
-            <div class="tool-badge hover-target">Wireshark</div>
-            <div class="tool-badge hover-target">Metasploit Framework</div>
-            <div class="tool-badge hover-target">Bash Scripting</div>
-            <div class="tool-badge hover-target">Burp Suite</div>
-            <div class="tool-badge hover-target">VS Code</div>
-            <div class="tool-badge hover-target">GDB Debugger</div>
-          </div>
-        </div>
-        
-        <div class="skill-group reveal delay-2">
-          <div class="skill-group-name">04 // Core Concepts</div>
-          <div class="tools-cloud">
-            <div class="tool-badge">Data Structures</div>
-            <div class="tool-badge">Algorithms</div>
-            <div class="tool-badge">Object Oriented Programming</div>
-            <div class="tool-badge">Operating Systems</div>
-            <div class="tool-badge">Computer Networks</div>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-  </section>
-
-  <section id="contact">
-    <div class="reveal">
-      <div class="section-label">Establish Connection</div>
-      <div class="contact-big">Let's<br/>Connect,<br/><span class="accent">Sumit.</span></div>
-      
-      <p class="contact-email">Ping me directly at<br/>
-        <a href="mailto:sumitdas712424@gmail.com" class="hover-target">sumitdas712424@gmail.com</a>
-      </p>
-      
-      <div class="social-links">
-        <a class="social-link hover-target" href="https://github.com/S-s-3440" target="_blank">GitHub</a>
-        <a class="social-link hover-target" href="#">LinkedIn</a>
-        <a class="social-link hover-target" href="#">Twitter/X</a>
+    <div class="panel status-panel">
+      <div class="status-line">// SYSTEM_HEALTH</div>
+      <div id="clock" style="font-size: 24px; color: #fff; margin-bottom: 10px;">00:00:00</div>
+      <div style="font-size: 12px;">
+        CPU: <span style="color: var(--glow-color);">OPTIMAL</span><br>
+        DEFENSES: <span style="color: var(--glow-color);">ACTIVE</span><br>
+        UPLINK: <span style="color: var(--glow-color);">ESTABLISHED</span>
       </div>
     </div>
 
-    <form class="contact-form reveal delay-1" id="contactForm">
-      <div class="form-group">
-        <label>Your Name // ID</label>
-        <input type="text" placeholder="John Doe" required />
-      </div>
-      <div class="form-group">
-        <label>Return Address // Email</label>
-        <input type="email" placeholder="john@domain.com" required />
-      </div>
-      <div class="form-group">
-        <label>Transmission // Message</label>
-        <textarea placeholder="Discussing a potential breach... I mean, project opportunity." required></textarea>
-      </div>
-      <button type="submit" class="btn-submit hover-target">Execute Send.sh</button>
-    </form>
-  </section>
+    <div class="panel project-panel">
+      <div class="status-line">FILE_01</div>
+      <h3>NET_SCANNER</h3>
+      <p style="font-size: 12px; margin-top: 10px;">Python script for automated Nmap reconnaissance and report generation.</p>
+    </div>
 
-  <footer>
-    <div class="footer-left">© 2026 Sumit Das — Jadavpur University</div>
-    <div class="footer-right">Secured & Built with pure code.</div>
-  </footer>
+    <div class="panel project-panel">
+      <div class="status-line">FILE_02</div>
+      <h3>ALGO_VAULT</h3>
+      <p style="font-size: 12px; margin-top: 10px;">Highly optimized C++ algorithms for real-time data processing.</p>
+    </div>
+
+    <div class="panel project-panel">
+      <div class="status-line">FILE_03</div>
+      <h3>CRYPT_X</h3>
+      <p style="font-size: 12px; margin-top: 10px;">Java application for AES-256 local file encryption/decryption.</p>
+    </div>
+
+    <div class="panel terminal" id="terminal">
+      <div>> INITIALIZING SUMIT_OS...</div>
+      <div>> SCANNING CORE... 100%</div>
+      <div>> CONTACT_EMAIL: sumitdas712424@gmail.com</div>
+      <div id="live-text">> _</div>
+    </div>
+  </div>
 
   <script>
-    // --- 1. Custom Cursor Logic ---
-    const cursor = document.getElementById('cursor');       // The tiny dot
-    const ring = document.getElementById('cursorRing');     // The trailing circle
-    const hoverTargets = document.querySelectorAll('.hover-target, a, button'); // Elements that make cursor expand
+    // 1. THE DECRYPTING NAME EFFECT
+    const nameElement = document.getElementById('brute-name');
+    const finalName = "SUMIT DAS";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
     
-    let mouseX = 0, mouseY = 0; // Where the mouse actually is
-    let ringX = 0, ringY = 0;   // Where the trailing ring currently is
-
-    // Update mouse coordinates whenever the mouse moves
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      // Immediately move the tiny dot to exact mouse coordinates
-      cursor.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-    });
-
-    // Smooth animation loop for the trailing ring
-    function animateRing() {
-      // Linear interpolation (lerp) - moves the ring 15% of the distance to the mouse every frame
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      
-      // Apply the position
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-      requestAnimationFrame(animateRing); // Call this function again on the next frame
+    function decrypt() {
+      let iteration = 0;
+      const interval = setInterval(() => {
+        nameElement.innerText = finalName.split("")
+          .map((letter, index) => {
+            if(index < iteration) return finalName[index];
+            return chars[Math.floor(Math.random() * chars.length)]
+          }).join("");
+        
+        if(iteration >= finalName.length) clearInterval(interval);
+        iteration += 1/3;
+      }, 50);
     }
-    animateRing(); // Start the loop
+    window.onload = decrypt;
 
-    // Add expansion class to ring when hovering over specific targets
-    hoverTargets.forEach(target => {
-      target.addEventListener('mouseenter', () => ring.classList.add('hover'));
-      target.addEventListener('mouseleave', () => ring.classList.remove('hover'));
-    });
+    // 2. LIVE CLOCK
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleTimeString();
+    }, 1000);
 
-
-    // --- 2. Scroll Animations (Intersection Observer) ---
-    // This tells the browser to trigger when 15% (0.15) of an element comes into view
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: "0px 0px -50px 0px" // Triggers slightly before the element fully hits the bottom of the screen
-    };
-
-    const scrollObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        // If the element has scrolled into view...
-        if (entry.isIntersecting) {
-          
-          // 1. Add 'visible' class to trigger the CSS fade-in animation
-          entry.target.classList.add('visible');
-          
-          // 2. If this section contains skill bars, animate their widths now
-          const skillBars = entry.target.querySelectorAll('.skill-bar-fill');
-          skillBars.forEach(bar => {
-            // Take the percentage stored in 'data-pct' in the HTML, and apply it to CSS width
-            bar.style.width = bar.getAttribute('data-pct') + '%';
-          });
-          
-          // Stop observing this element so the animation only happens once
-          scrollObserver.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    // Find all HTML elements with the class 'reveal' and watch them with our observer
-    document.querySelectorAll('.reveal').forEach(el => scrollObserver.observe(el));
-
-
-    // --- 3. Contact Form Submission Simulation ---
-    // Right now, the form doesn't send data to a server. This stops the page from reloading.
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
-      e.preventDefault(); // Stop default browser refresh
-      
-      // Provide visual feedback that the button was clicked
-      const btn = e.target.querySelector('button');
-      btn.innerText = "Transmitted ✓";
-      btn.style.background = "#27c93f"; // Change button to green
-      btn.style.color = "#fff";
-      
-      // Reset the button and clear the form after 3 seconds
-      setTimeout(() => {
-        btn.innerText = "Execute Send.sh";
-        btn.style.background = "var(--accent)";
-        btn.style.color = "#000";
-        e.target.reset(); // Clears all input fields
-      }, 3000);
-    });
+    // 3. TERMINAL AUTO-TYPE
+    const termLine = document.getElementById('live-text');
+    const messages = [
+      "> AUTHENTICATING ACCESS...",
+      "> WELCOME, VISITOR.",
+      "> SYSTEM RUNNING AT 100% EFFICIENCY.",
+      "> SECURING PORTFOLIO_DATA..."
+    ];
+    let msgIndex = 0;
+    
+    setInterval(() => {
+      termLine.innerText = messages[msgIndex];
+      msgIndex = (msgIndex + 1) % messages.length;
+    }, 4000);
   </script>
 </body>
 </html>
