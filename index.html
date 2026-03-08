@@ -3,144 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMIT DAS // WORLD_VIEW</title>
-    
+    <title>SUMIT DAS // NEXUS_PRIME</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=JetBrains+Mono:wght@200;500&display=swap" rel="stylesheet">
     
-    <script src="https://simplemaps.com/lib/world_map.js"></script>
-
     <style>
         :root {
             --primary: #00ffaa; 
-            --bg: #030405;
+            --bg: #050608;
             --surface: rgba(255, 255, 255, 0.03);
             --border: rgba(0, 255, 170, 0.2);
             --text-main: #ffffff;
+            --text-dim: #808080;
         }
 
+        /* 1. CORE SYSTEM RESET */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        body { background: var(--bg); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #0a110f 0%, #050608 100%);
+        }
 
-        /* Background Canvas */
-        #network-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.2; }
+        /* 2. THE VISUAL MATRIX (CANVAS) */
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; }
+
+        /* 3. HUD CURSOR */
         #cursor-dot { position: fixed; width: 4px; height: 4px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10001; }
-        #cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid var(--primary); border-radius: 50%; pointer-events: none; z-index: 10000; transition: 0.1s ease-out; }
-
-        .main-container { max-width: 1200px; margin: 0 auto; padding: 60px 40px; }
-
-        /* THE VISITOR MAP BOX */
-        .map-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 30px;
-            margin-top: 40px;
-            border-radius: 4px;
-            position: relative;
+        #cursor-ring { 
+            position: fixed; width: 30px; height: 30px; border: 1px solid var(--primary); 
+            border-radius: 50%; pointer-events: none; z-index: 10000; 
+            transition: transform 0.1s ease-out, border 0.3s; 
         }
 
-        #map { width: 100%; height: 400px; filter: hue-rotate(110deg) brightness(0.8) contrast(1.2); }
+        .main-container { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
 
-        .map-overlay {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid var(--primary);
-            font-family: 'JetBrains Mono'; font-size: 10px;
+        /* 4. BRANDING HERO */
+        .hero { margin-bottom: 60px; }
+        .hero-title { font-size: clamp(45px, 10vw, 110px); font-weight: 800; line-height: 0.8; letter-spacing: -4px; }
+        .strike { color: var(--primary); text-decoration: line-through; text-decoration-thickness: 6px; }
+
+        /* 5. THE GLOBAL MONITOR (REBUILT WITHOUT LIBRARIES) */
+        .monitor-box {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 30px; border-radius: 4px; position: relative; margin: 40px 0;
+            backdrop-filter: blur(10px);
         }
+        .monitor-header {
+            display: flex; justify-content: space-between; font-family: 'JetBrains Mono';
+            font-size: 11px; color: var(--primary); margin-bottom: 20px;
+        }
+        #map-svg { width: 100%; height: auto; opacity: 0.6; fill: none; stroke: var(--primary); stroke-width: 0.5; }
+        
+        .pulse { fill: var(--primary); animation: pings 2s infinite; }
+        @keyframes pings { 0% { r: 1; opacity: 1; } 100% { r: 15; opacity: 0; } }
 
-        /* GRID STYLING */
-        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px; }
-        .bento-item { background: var(--surface); border: 1px solid var(--border); padding: 30px; }
-
-        .hero-title { font-size: clamp(40px, 8vw, 80px); font-weight: 800; line-height: 0.85; margin-bottom: 20px;}
-        .strike { color: var(--primary); text-decoration: line-through; text-decoration-thickness: 4px; }
+        /* 6. BENTO INTERFACE */
+        .bento { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .bento-card { 
+            background: var(--surface); border: 1px solid var(--border); 
+            padding: 40px; transition: 0.4s; position: relative; overflow: hidden;
+        }
+        .bento-card:hover { border-color: var(--primary); transform: translateY(-5px); background: rgba(0, 255, 170, 0.05); }
+        .tag { font-family: 'JetBrains Mono'; color: var(--primary); font-size: 11px; text-transform: uppercase; }
 
         .btn {
-            display: inline-block; background: var(--primary); color: #000;
-            padding: 12px 25px; font-family: 'JetBrains Mono'; font-weight: 800;
-            text-decoration: none; margin-top: 20px; transition: 0.3s;
+            display: inline-block; padding: 15px 30px; background: var(--primary); 
+            color: #000; font-family: 'JetBrains Mono'; font-weight: bold; 
+            text-decoration: none; margin-top: 25px; transition: 0.3s;
         }
-        .btn:hover { box-shadow: 0 0 20px var(--primary); transform: translateY(-3px); }
+        .btn:hover { box-shadow: 0 0 30px var(--primary); }
 
-        @media (max-width: 768px) { .bento-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .bento { grid-template-columns: 1fr; } #cursor-ring, #cursor-dot { display: none; } * { cursor: auto !important; } }
     </style>
 </head>
 <body>
 
-    <canvas id="network-canvas"></canvas>
+    <canvas id="bg-canvas"></canvas>
     <div id="cursor-dot"></div>
     <div id="cursor-ring"></div>
 
     <main class="main-container">
-        <section>
+        <header class="hero">
+            <span class="tag">// SEC_ENTITY: SUMIT_DAS_V7</span>
             <h1 class="hero-title">Coder.<br><span class="strike">Breaker.</span><br>Builder.</h1>
-            <p style="opacity: 0.6; max-width: 500px;">Jadavpur University // Cybersecurity 2026. Monitoring global threat vectors and building resilient systems.</p>
-        </section>
+            <p style="margin-top: 20px; color: var(--text-dim); max-width: 500px; font-size: 18px;">
+                Cybersecurity Scholar at <span style="color:white">Jadavpur University</span>. Mapping the architecture of resilient systems.
+            </p>
+        </header>
 
-        <section class="map-section">
-            <div class="map-overlay">
-                <div style="color: var(--primary)">> LIVE_TRAFFIC_FEED</div>
-                <div id="log-entry">Uplink: Kolkata, IN (Primary)</div>
+        <section class="monitor-box">
+            <div class="monitor-header">
+                <div>[ SYSTEM_LOG: ACTIVE ]</div>
+                <div id="uplink-text">UPLINK: KOLKATA_NODE_SECURE</div>
             </div>
-            <h3 style="font-family: 'JetBrains Mono'; margin-bottom: 20px;">GEOGRAPHIC_UPLINK_MONITOR</h3>
-            <div id="map"></div>
+            <svg id="map-svg" viewBox="0 0 800 400">
+                <path d="M100,100 Q150,50 200,100 T300,150 T400,100 T550,150 T700,100" /> <circle cx="580" cy="180" r="3" class="pulse" /> <circle cx="580" cy="180" r="2" fill="white" />
+                <path d="M200,250 Q300,300 450,250 T650,300" opacity="0.3" />
+            </svg>
         </section>
 
-        <div class="bento-grid">
-            <div class="bento-item">
-                <span style="font-family: 'JetBrains Mono'; color: var(--primary); font-size: 11px;">[ ASSET_01 ]</span>
-                <h2 style="margin: 10px 0;">Resume.pdf</h2>
-                <p style="font-size: 14px; opacity: 0.7;">Latest technical CV including security certifications and JU projects.</p>
+        <div class="bento">
+            <div class="bento-card">
+                <span class="tag">Asset_Extraction</span>
+                <h2 style="margin: 15px 0;">Resume_2026.pdf</h2>
+                <p style="color: var(--text-dim); font-size: 14px;">Detailed technical expertise in penetration testing and system architecture.</p>
                 <a href="#" class="btn">Download Assets</a>
             </div>
 
-            <div class="bento-item">
-                <span style="font-family: 'JetBrains Mono'; color: var(--primary); font-size: 11px;">[ CHANNEL_01 ]</span>
-                <h2 style="margin: 10px 0;">Direct Contact</h2>
-                <p style="font-size: 14px; opacity: 0.7;">Submit an encrypted message to sumitdas712424@gmail.com.</p>
-                <a href="mailto:sumitdas712424@gmail.com" class="btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Open Channel</a>
+            <div class="bento-card">
+                <span class="tag">Comm_Link</span>
+                <h2 style="margin: 15px 0;">Direct_Uplink</h2>
+                <p style="color: var(--text-dim); font-size: 14px;">Send a secure transmission to sumitdas712424@gmail.com.</p>
+                <a href="mailto:sumitdas712424@gmail.com" class="btn" style="background:transparent; color:var(--primary); border:1px solid var(--primary);">Initialize Chat</a>
             </div>
         </div>
     </main>
 
     <script>
-        // 1. DYNAMIC BACKGROUND
-        const canvas = document.getElementById('network-canvas');
+        // 1. DYNAMIC BACKGROUND (Optimized for full-screen)
+        const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-        function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            particles = Array.from({length: 40}, () => ({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3
-            }));
-        }
-        function animate() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                ctx.fillStyle = "rgba(0, 255, 170, 0.4)";
-                ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
-            });
-            requestAnimationFrame(animate);
-        }
-        init(); animate();
+        let dots = [];
 
-        // 2. CURSOR SCRIPT
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function init() {
+            dots = [];
+            for(let i=0; i<80; i++) {
+                dots.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "rgba(0, 255, 170, 0.4)";
+            dots.forEach(d => {
+                d.x += d.vx; d.y += d.vy;
+                if(d.x < 0 || d.x > canvas.width) d.vx *= -1;
+                if(d.y < 0 || d.y > canvas.height) d.vy *= -1;
+                ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', () => { resize(); init(); });
+        resize(); init(); draw();
+
+        // 2. CURSOR FOLLOW
         const dot = document.getElementById('cursor-dot');
         const ring = document.getElementById('cursor-ring');
         document.addEventListener('mousemove', (e) => {
-            dot.style.left = `${e.clientX}px`; dot.style.top = `${e.clientY}px`;
-            ring.style.left = `${e.clientX - 15}px`; ring.style.top = `${e.clientY - 15}px`;
+            dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            ring.style.transform = `translate(${e.clientX - 15}px, ${e.clientY - 15}px)`;
         });
 
-        // 3. MAP LOGIC SIMULATION
-        // In a real version, you'd use an API like 'ipapi' to get visitor data.
-        const locations = ["New York, US", "London, UK", "Kolkata, IN", "Berlin, DE", "Singapore, SG"];
-        const log = document.getElementById('log-entry');
+        // 3. UI INTERACTION
+        document.querySelectorAll('.bento-card, .btn').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                ring.style.transform += ' scale(1.5)';
+                ring.style.borderColor = 'white';
+            });
+            item.addEventListener('mouseleave', () => {
+                ring.style.borderColor = 'var(--primary)';
+            });
+        });
+
+        // 4. RANDOMIZED LOGS
+        const nodes = ["KOLKATA", "LONDON", "TOKYO", "BERLIN", "SINGAPORE"];
         setInterval(() => {
-            const loc = locations[Math.floor(Math.random() * locations.length)];
-            log.innerHTML = `Uplink: ${loc} (Active)`;
+            const node = nodes[Math.floor(Math.random()*nodes.length)];
+            document.getElementById('uplink-text').innerText = `UPLINK: ${node}_NODE_STABLE`;
         }, 4000);
     </script>
 </body>
